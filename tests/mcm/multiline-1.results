@@ -1,0 +1,41 @@
+#!/bin/sh
+
+output='
+> dummy_module
+	
+
+foo
+bar
+
+more
+ 
+a space on the line just before is respected on the output
+'"'"'quotation"
+more
+\backslash\
+
+blank lines at the end are always chopped off
+  [ok]
+> dummy_module
+foo
+  spaces before are preserved
+spaces   at the right will also be preserved    
+  [ok]
+> dummy_module
+
+
+any starting empty new lines are preserved
+(but those in between, stay)
+
+blank lines at the end are always chopped off
+  [ok]
+> dummy_module
+  [ok]'
+
+expected_test_out="$output
+ok: 4	nok: 0	skipped: 0
+"
+
+expected_execute_out="$output
+ok: 4	changed: 0	skipped: 0
+"

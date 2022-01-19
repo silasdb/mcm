@@ -1,0 +1,6 @@
+#!/bin/sh
+expected_mcm_test_err="
+mcm: /nonexistent_MCM_FILE: No such file or directory
+in task dummy_module -test_ret 1 +test_out /nonexistent_MCM_FILE
+"
+expected_mcm_execute_err="$expected_mcm_test_err"

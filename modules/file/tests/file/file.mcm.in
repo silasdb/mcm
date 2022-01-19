@@ -1,0 +1,57 @@
+task file \
+	.name 'test file creation - one line with quotes' \
+	-path '@testdir@/a_file' \
+	-content "test1 'single quote \"   double quote with trailing spaces at the end   "
+
+task file \
+	.name 'test file creation - two single quotes' \
+	-path '@testdir@/other_file' \
+	-content "test1 'single quote and then another ' single quote"
+
+task file \
+	.name 'test file creation - multiple lines' \
+	-path '@testdir@/file name with spaces' \
+	+content - <<-'EOF'
+
+		Just after a blank 'line
+		One more line
+		
+		  
+		Two spaces on line before - will be preserved
+		Trailing spaces at end are preserved:   
+		
+		
+		Two more blank lines before and after this are dropped because
+		of mcm limitations
+	
+
+	EOF
+
+task file \
+	.name 'file permissions test' \
+	-path @testdir@/file0644 \
+	-mode 0644 \
+	-content ''
+
+task file \
+	.name 'file permissions test' \
+	-path @testdir@/file0755 \
+	-content '' \
+	-mode 0755
+
+task file \
+	.name 'file permissions test' \
+	-path @testdir@/file0755 \
+	-content '' \
+	-mode 755
+
+task file \
+	.name 'file permissions test' \
+	-path @testdir@/file0755 \
+	-content bla \
+	-mode 644
+
+task file \
+	.name 'file permissions test' \
+	-path @testdir@/file0755 \
+	-mode 0755

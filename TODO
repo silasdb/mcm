@@ -1,0 +1,6 @@
+TODO before releasing:
+
+* search for "sh" and replace by ${SH}?  how to test everything with a shell
+  other than /bin/sh?
+* test with different shells
+* test with env -i

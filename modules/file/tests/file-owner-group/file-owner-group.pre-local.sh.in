@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# We need to create mocks for chown and chgrp, otherwise we needed to create
+# users or groups at the system level to test this module.  Also, chown and
+# chgrp need to be run as root, making it impossible to test this module as an
+# unprivileged user.
+#
+# Both chown and chgrp mocks create "control file" that have the same name as
+# the file itself, plus ".owner" or ".group" strings.  These control files hold
+# the username or the groupname for the original file.  They are queried by our
+# stat mock program below so it returns the expected owner or group.
+
+set -eu
+
+mkdir '@testdir@/mocks'
+
+cat >'@testdir@/mocks/chown' <<-'EOF'
+	#!/bin/sh
+	echo "$1" > "$2.owner"
+EOF
+
+cat >'@testdir@/mocks/chgrp' <<-'EOF'
+	#!/bin/sh
+	echo "$1" > "$2.group"
+EOF
+
+cat >'@testdir@/mocks/stat' <<-'EOF'
+	#!/bin/sh
+	set -eu
+	type=owner
+	if [ "$2" = '%G' -o "$2" = '%Sg' ]; then
+		type=group
+	fi
+	if [ -f "$3.$type" ]; then
+		cat "$3.$type"
+	else
+		echo none
+	fi
+EOF
+
+chmod 755 '@testdir@/mocks/stat'
+chmod 755 '@testdir@/mocks/chown'
+chmod 755 '@testdir@/mocks/chgrp'

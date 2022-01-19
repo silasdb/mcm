@@ -1,0 +1,2 @@
+#!/bin/sh
+pkg_info -q -E mysql-server

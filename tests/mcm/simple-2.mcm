@@ -1,0 +1,8 @@
+task dummy_module .msg 'f\o"o' -test_ret 0
+
+task dummy_module -test_ret 1
+
+task dummy_module -test_ret 1 \
+	-execute_out '    spaces before and     after    '
+
+task dummy_module .msg "ba'r" -test_ret 1

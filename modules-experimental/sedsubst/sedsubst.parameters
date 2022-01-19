@@ -1,0 +1,5 @@
+char:optional
+regexp:required
+replacement:required
+path:required
+sedoptions:optional

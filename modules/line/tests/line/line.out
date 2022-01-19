@@ -1,0 +1,5 @@
+> line to a non-existent file
+  [changed]
+> append a file to the same file
+  [changed]
+ok: 0	changed: 2	skipped: 0

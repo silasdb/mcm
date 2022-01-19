@@ -1,0 +1,3 @@
+pkg_netbsd:
+	*name: Adds dummy package
+	name: mysql-server

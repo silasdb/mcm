@@ -1,0 +1,23 @@
+task file \
+	.name 'test file creation with user and group' \
+	-path '@testdir@/a_file' \
+	-content 'test1' \
+	-owner mcm_testuser \
+	-group mcm_testgroup
+
+task file \
+	.name 'create file, but set user and group later' \
+	-path '@testdir@/a_file_lazy' \
+	-content 'test2'
+
+task file \
+	.name 'now set user and group for the file' \
+	-path '@testdir@/a_file_lazy' \
+	-owner mcm_testuser \
+	-group mcm_testgroup
+
+task file \
+	.name 'try set it again' \
+	-path '@testdir@/a_file_lazy' \
+	-owner mcm_testuser \
+	-group mcm_testgroup

@@ -1,0 +1,11 @@
+> test only - shell: no
+  [ok]
+> test and execute - shell: no
+b
+  [changed]
+> test only - shell: yes
+  [ok]
+> test and execute - shell: yes
+b
+  [changed]
+ok: 2	changed: 2	skipped: 0

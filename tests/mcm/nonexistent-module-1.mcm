@@ -1,0 +1,2 @@
+# Here we have two modules without an empty line together
+task nonexistant -test_ret 0 -foo baz -bar zaz
