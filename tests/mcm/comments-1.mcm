@@ -1,0 +1,8 @@
+task dummy_module -test_ret 0
+task dummy_module -test_ret 1 +execute_out - <<EOF
+# module comment
+
+ # other module comment (after a space)
+	# other module comment (after a tab)
+ 	# other module comment (after a space and a tab)
+EOF

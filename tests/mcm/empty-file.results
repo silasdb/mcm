@@ -1,0 +1,12 @@
+#!/bin/sh
+expected_test_out='
+ok: 0	nok: 0	skipped: 0
+'
+expected_test_err='
+'
+expected_execute_err='
+'
+expected_execute_out='
+ok: 0	changed: 0	skipped: 0
+'
+expected_execute_ret=0

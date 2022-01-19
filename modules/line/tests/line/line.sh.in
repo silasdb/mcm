@@ -1,0 +1,6 @@
+#!/bin/sh
+
+diff -u @testdir@/a_file - <<'EOF'
+test1 'single quote "   double quote with trailing spaces at the end   
+test1 'single quote and then another ' single quote
+EOF

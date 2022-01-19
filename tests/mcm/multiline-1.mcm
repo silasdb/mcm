@@ -1,0 +1,36 @@
+
+
+task dummy_module -test_ret 0 -test_out '	
+
+foo
+bar
+
+more
+ 
+a space on the line just before is respected on the output
+'"'"'quotation"
+more
+\backslash\
+
+blank lines at the end are always chopped off
+
+'
+
+task dummy_module -test_ret 0 -test_out 'foo
+  spaces before are preserved
+spaces   at the right will also be preserved    '
+
+task dummy_module -test_ret 0 +test_out - <<EOF
+
+
+any starting empty new lines are preserved
+(but those in between, stay)
+
+blank lines at the end are always chopped off
+
+
+EOF
+
+
+
+task dummy_module -test_ret 0

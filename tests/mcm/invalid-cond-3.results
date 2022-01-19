@@ -1,0 +1,6 @@
+#!/bin/sh
+expected_mcm_test_err='
+Invalid condition: "foo s x bla"
+in task dummy_module .cond foo s x bla -test_ret 0
+'
+expected_mcm_execute_err="$expected_mcm_test_err"

@@ -1,0 +1,6 @@
+#!/bin/sh
+expected_mcm_test_err='
+The following required parameters are not given: "test_ret"
+in task dummy_module -test_out bla
+'
+expected_mcm_execute_err="$expected_mcm_test_err"

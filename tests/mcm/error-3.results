@@ -1,0 +1,7 @@
+#!/bin/sh
+
+expected_mcm_test_err='
+Unrecognized variable category: %var
+in task dummy_module %var foo -test_ret 1
+'
+expected_mcm_execute_err="$expected_mcm_test_err"

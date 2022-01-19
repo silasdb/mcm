@@ -1,0 +1,7 @@
+#!/bin/sh
+expected_mcm_test_err="
+Module \"nonexistant\" not found or doesn't
+implement both test and execute phases.
+in task nonexistant -test_ret 0 -foo baz -bar zaz
+"
+expected_mcm_execute_err="$expected_mcm_test_err"

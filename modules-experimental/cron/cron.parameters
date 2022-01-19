@@ -1,0 +1,4 @@
+user:optional
+job:required
+name:required
+time_spec:required

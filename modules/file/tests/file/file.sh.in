@@ -1,0 +1,50 @@
+#!/bin/sh
+echo "test1 'single quote \"   double quote with trailing spaces at the end   " > @testdir@/a_file.check
+diff -u @testdir@/a_file.check @testdir@/a_file
+
+echo "test1 'single quote and then another ' single quote" > @testdir@/other_file.check
+diff -u @testdir@/other_file.check @testdir@/other_file
+
+cat >'@testdir@/file name with spaces.check' <<EOF
+
+Just after a blank 'line
+One more line
+
+  
+Two spaces on line before - will be preserved
+Trailing spaces at end are preserved:   
+
+
+Two more blank lines before and after this are dropped because
+of mcm limitations
+EOF
+diff -u '@testdir@/file name with spaces' '@testdir@/file name with spaces.check'
+
+stat_perms () {
+	local p
+	case "$(uname)" in
+	Linux)
+		p=$(stat -c %a "$@")
+		if [ ${#p} -eq 3 ]; then
+			p="0$p"
+		fi
+		;;
+	*)
+		p="$(stat -f %p "$@")"
+		if [ ${#p} -eq 6 ]; then
+			p="${p#??}"
+		elif [ ${#p} -eq 5 ]; then
+			p="${p#?}"
+		fi
+		;;
+	esac
+	echo "$p"
+}
+
+test -f "@testdir@/file0644"
+test "$(stat_perms '@testdir@/file0644')" = '0644'
+
+echo "bla" > @testdir@/file0755.check
+diff -u @testdir@/file0755.check @testdir@/file0755
+test -f "@testdir@/file0755"
+test "$(stat_perms '@testdir@/file0755')" = '0755'

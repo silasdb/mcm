@@ -1,0 +1,9 @@
+> test file creation with user and group
+  [changed]
+> create file, but set user and group later
+  [changed]
+> now set user and group for the file
+  [changed]
+> try set it again
+  [ok]
+ok: 1	changed: 3	skipped: 0

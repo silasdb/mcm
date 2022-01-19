@@ -1,0 +1,5 @@
+# Invalid special variables are silently ignored
+task dummy_module \
+	-test_ret 1 \
+	.invalid_var 'this is a invalid special var' \
+	-execute_ret 0

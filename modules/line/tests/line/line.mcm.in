@@ -1,0 +1,9 @@
+task line \
+	.name 'line to a non-existent file' \
+	-path '@testdir@/a_file' \
+	-line "test1 'single quote \"   double quote with trailing spaces at the end   "
+
+task line \
+	.name 'append a file to the same file' \
+	-path '@testdir@/a_file' \
+	-line "test1 'single quote and then another ' single quote"

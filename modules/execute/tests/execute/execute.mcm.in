@@ -1,0 +1,21 @@
+task execute \
+	.name 'test only - shell: no' \
+	-test 'true' \
+	-execute 'echo a'
+
+task execute \
+	.name 'test and execute - shell: no' \
+	-test 'false' \
+	-execute 'echo b'
+
+task execute \
+	.name 'test only - shell: yes' \
+	-shell yes \
+	-test 'x=0; exit $x' \
+	-execute 'x=a; echo $x'
+
+task execute \
+	.name 'test and execute - shell: yes' \
+	-shell yes \
+	-test 'x=1; exit $x' \
+	-execute 'x=b; echo $x'

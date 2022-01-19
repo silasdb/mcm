@@ -1,0 +1,1 @@
+task dummy_module %var foo -test_ret 1

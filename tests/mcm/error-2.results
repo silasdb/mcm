@@ -1,0 +1,7 @@
+#!/bin/sh
+
+expected_mcm_test_err='
+Invalid number of parameters for "task dummy_module".
+in task dummy_module -test_ret 1 -bla
+'
+expected_mcm_execute_err="$expected_mcm_test_err"
