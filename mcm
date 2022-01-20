@@ -28,6 +28,10 @@ MCM_output ()
 	MCM_target_script="${MCM_target_script}$*${MCM_NL}"
 }
 
+MCM_output_tail () {
+	MCM_target_script_tail="${MCM_target_script_tail}${MCM_NL}$*"
+}
+
 ### Constants ###
 
 # A newline character
@@ -42,6 +46,9 @@ MCM_modules_PATH=
 
 # A list of modules loaded to the target script.
 MCM_modules_loaded=
+
+# Current output function
+MCM_output=MCM_output
 
 # The following variables are set for the current task being processed.
 
@@ -61,6 +68,12 @@ MCM_special_var_cond=
 MCM_special_var_msg=
 # Register the current task sets.
 MCM_special_var_register=
+# TODO
+MCM_special_var_notify=
+# TODO
+MCM_special_var_handler=
+
+MCM_target_script_tail=
 
 # The version of mcm.  If it is "something"-devel, it is an unstable version
 # downloaded from the source version control.
@@ -444,6 +457,12 @@ MCM_set_special_var ()
 	.register)
 		MCM_special_var_register="$value"
 		;;
+	.notify)
+		MCM_special_var_notify="$value"
+		;;
+	.handler)
+		MCM_special_var_handler="$value"
+		;;
 	*)
 		MCM_fatal "Invalid special variable: \"$var\""
 		;;
@@ -504,7 +523,7 @@ MCM_parameter ()
 		MCM_fatal "Unrecognized variable category: $var2"
 		;;
 	esac
-	MCM_output "export $var=$(MCM_quote "$value")"
+	$MCM_output "export $var=$(MCM_quote "$value")"
 }
 
 MCM_add_module_definition ()
@@ -514,7 +533,7 @@ MCM_add_module_definition ()
 	if ! echo "$MCM_modules_loaded" | grep -q -w "$module"; then
 		# We now define two functions to the target script that contains
 		# the test and execute phases.
-		MCM_output "$(MCM_print_module_definition "$module")"
+		$MCM_output "$(MCM_print_module_definition "$module")"
 
 		# Add loaded modules to the MCM_modules_loaded variable so we
 		# prevent it from being loaded again.
@@ -546,18 +565,37 @@ MCM_add_module_call ()
 	# is not set.
 	local cond_begin=
 	local cond_end=
-	if [ -n "$MCM_special_var_cond" ]; then
-		cond_begin="if ($MCM_special_var_cond); then"
+
+
+	if [ -n "$MCM_special_var_handler" ]; then
+		local v="\"\$MCM_handler_$MCM_special_var_handler\""
+		cond_begin="if [ $v = 'nok' -o $v = 'changed' ]; then"
 		cond_end='fi'
 	fi
 
-	MCM_output "$(MCM_print_task_logic "$module" "$MCM_special_var_msg" \
+	if [ -n "$MCM_special_var_cond" ]; then
+		cond_begin="if $MCM_special_var_cond; then"
+		cond_end='fi'
+	fi
+
+	$MCM_output "$(MCM_print_task_logic "$module" "$MCM_special_var_msg" \
 		"$cond_begin" "$cond_end")"
+
+	if [ -n "$MCM_special_var_notify" ]; then
+		local v="\"\$MCM_handler_$MCM_special_var_notify\""
+		local c="\"\${MCM_handler_$MCM_special_var_notify+x}\""
+		$MCM_output "if [ -z $c ]; then"
+		$MCM_output " MCM_handler_$MCM_special_var_notify=ok"
+		$MCM_output "fi"
+		$MCM_output "if [ $v != 'nok' -a $v != 'changed' ]; then"
+		$MCM_output " MCM_handler_$MCM_special_var_notify=\$MCM_state"
+		$MCM_output "fi"
+	fi
 
 	# Set a register value to the state of the task.  If the test is "nok",
 	# the content "changed" should be set instead.
 	if [ -n "$MCM_special_var_register" ]; then
-		MCM_output "$(MCM_print_register "$MCM_special_var_register")"
+		$MCM_output "$(MCM_print_register "$MCM_special_var_register")"
 	fi
 }
 
@@ -616,7 +654,7 @@ MCM_main ()
 		MCM_usage
 	fi
 
-	MCM_output "$(MCM_print_header)"
+	$MCM_output "$(MCM_print_header)"
 
 	# Embed the user script that calls task and other public functions.
 	if [ "$MCM_source" != '-' ]; then
@@ -629,13 +667,17 @@ MCM_main ()
 		. "$MCM_tmpfile"
 	fi
 
-	MCM_output "$(MCM_print_footer)"
-
 	if [ "$MCM_destination" != '-' ]; then
 		exec 1>"$MCM_destination"
 	fi
 
 	echo "$MCM_target_script"
+
+	if [ -n "$MCM_target_script_tail" ]; then
+		echo 'echo "=> Calling handlers..."'
+	fi
+	echo "$MCM_target_script_tail"
+	echo "$(MCM_print_footer)"
 }
 
 MCM_set_special_vars ()
@@ -680,12 +722,17 @@ task ()
 	MCM_add_module_definition "$module"
 	MCM_set_special_vars "$@"
 	local name="$module"
+
+	if [ -n "$MCM_special_var_handler" ]; then
+		MCM_output=MCM_output_tail
+	fi
+
 	if [ -n "$MCM_special_var_msg" ]; then
 		name="$MCM_special_var_msg"
 	fi
-	MCM_output ''
-	MCM_output "# ---- $name"
-	MCM_output "echo \> $(MCM_quote "$name")"
+	$MCM_output ''
+	$MCM_output "# ---- $name"
+	$MCM_output "echo \> $(MCM_quote "$name")"
 
 	# We make a shell-friendly list of required and optional parameters so
 	# we can detect user typos.
@@ -730,13 +777,23 @@ task ()
 	# Add code for removal of parameter files.
 	local p
 	for p in $parameters_passed; do
-		MCM_output "unset $p"
+		$MCM_output "unset $p"
 	done
 
 	# Reset global variables.
 	MCM_special_var_cond=
 	MCM_special_var_msg=
 	MCM_special_var_register=
+	MCM_special_var_notify=
+	MCM_special_var_handler=
+
+	MCM_output=MCM_output
+}
+
+handler () {
+	local h="$1"
+	shift
+	task "$@" .handler "$h"
 }
 
 MCM_main "$@"
