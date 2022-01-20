@@ -7,8 +7,11 @@ mcm and its modules are written in `/bin/sh` and use common Unix tools, so
 it doesn't require anything special neither on the host nor on the target
 side.
 
-For reference, the URL https://purl.org/net/mcm will always point to the mcm
-webpage or repository.  Use it if you want to cite mcm.
+[Official website](https://silas.net.br/projects/mcm)
+
+[Purl URL that redirects to the current oficial website](https://purl.org/net/mcm)
+
+[GitHub mirror](https://github.com/silasdb/mcm)
 
 ## Example
 
