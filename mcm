@@ -793,7 +793,7 @@ task ()
 handler () {
 	local h="$1"
 	shift
-	task "$@" .handler "$h"
+	"$@" .handler "$h"
 }
 
 MCM_main "$@"
