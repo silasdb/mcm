@@ -1,0 +1,12 @@
+# A tree of handlers
+
+handler parent \
+	task dummy_module -test_ret 1 .notify 'first second' .msg parent
+handler first \
+	task dummy_module -test_ret 1 .msg first
+handler second \
+	task dummy_module -test_ret 1 .msg second
+
+task dummy_module -test_ret 1 .notify parent
+task dummy_module -test_ret 0 .notify first
+task dummy_module -test_ret 0 .notify second

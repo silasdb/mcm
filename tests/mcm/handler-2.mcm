@@ -1,0 +1,4 @@
+task dummy_module .msg 'handler A' -test_ret 1 .handler A
+handler B task dummy_module .msg 'handler B' -test_ret 1
+
+task dummy_module -test_ret 1 .notify 'A B'

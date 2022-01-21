@@ -1,0 +1,34 @@
+#!/bin/sh
+expected_test_out='
+> dummy_module
+  [nok]
+> dummy_module
+  [ok]
+> dummy_module
+  [ok]
+=> Calling handlers...
+> parent
+  [nok]
+> first
+  [nok]
+> second
+  [nok]
+ok: 2	nok: 4	skipped: 0
+'
+
+expected_execute_out='
+> dummy_module
+  [changed]
+> dummy_module
+  [ok]
+> dummy_module
+  [ok]
+=> Calling handlers...
+> parent
+  [changed]
+> first
+  [changed]
+> second
+  [changed]
+ok: 2	changed: 4	skipped: 0
+'
