@@ -1,0 +1,22 @@
+#!/bin/sh
+expected_test_out='
+> dummy_module
+  [nok]
+=> Calling handlers...
+> handler A
+  [nok]
+> handler B
+  [nok]
+ok: 0	nok: 3	skipped: 0
+'
+
+expected_execute_out='
+> dummy_module
+  [changed]
+=> Calling handlers...
+> handler A
+  [changed]
+> handler B
+  [changed]
+ok: 0	changed: 3	skipped: 0
+'

@@ -581,16 +581,17 @@ MCM_add_module_call ()
 	$MCM_output "$(MCM_print_task_logic "$module" "$MCM_special_var_msg" \
 		"$cond_begin" "$cond_end")"
 
-	if [ -n "$MCM_special_var_notify" ]; then
-		local v="\"\$MCM_handler_$MCM_special_var_notify\""
-		local c="\"\${MCM_handler_$MCM_special_var_notify+x}\""
+	local x
+	for x in $MCM_special_var_notify; do
+		local v="\"\$MCM_handler_$x\""
+		local c="\"\${MCM_handler_$x+x}\""
 		$MCM_output "if [ -z $c ]; then"
-		$MCM_output " MCM_handler_$MCM_special_var_notify=ok"
+		$MCM_output " MCM_handler_$x=ok"
 		$MCM_output "fi"
 		$MCM_output "if [ $v != 'nok' -a $v != 'changed' ]; then"
-		$MCM_output " MCM_handler_$MCM_special_var_notify=\$MCM_state"
+		$MCM_output " MCM_handler_$x=\$MCM_state"
 		$MCM_output "fi"
-	fi
+	done
 
 	# Set a register value to the state of the task.  If the test is "nok",
 	# the content "changed" should be set instead.
