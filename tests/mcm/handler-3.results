@@ -6,14 +6,26 @@ expected_test_out='
   [ok]
 > dummy_module
   [ok]
+> dummy_module
+  [nok]
+> dummy_module
+  [ok]
+> dummy_module
+  [ok]
 => Calling handlers...
-> parent
+> parent1
   [nok]
-> first
+> first1
   [nok]
-> second
+> second1
   [nok]
-ok: 2	nok: 4	skipped: 0
+> first2
+  [skipped]
+> second2
+  [skipped]
+> parent2
+  [nok]
+ok: 4	nok: 6	skipped: 2
 '
 
 expected_execute_out='
@@ -23,12 +35,24 @@ expected_execute_out='
   [ok]
 > dummy_module
   [ok]
+> dummy_module
+  [changed]
+> dummy_module
+  [ok]
+> dummy_module
+  [ok]
 => Calling handlers...
-> parent
+> parent1
   [changed]
-> first
+> first1
   [changed]
-> second
+> second1
   [changed]
-ok: 2	changed: 4	skipped: 0
+> first2
+  [skipped]
+> second2
+  [skipped]
+> parent2
+  [changed]
+ok: 4	changed: 6	skipped: 2
 '
