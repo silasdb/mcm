@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# TODO: don't use $PWD here. Create a temporary directory instead.
+
 # crontab(1) calls your favorite editor (by reading the contents of environment
 # variable $EDITOR).  After the user quits the editor, crontab(1) verifies if
 # any change was made (the NetBSD version of crontab checks for time update
@@ -105,5 +107,5 @@ grep -q 'errors in crontab file' fakeeditor.out && {
 	exit 1
 }
 
-rm fakeeditor
+#rm fakeeditor
 rm fakeeditor.out
