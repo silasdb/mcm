@@ -72,6 +72,8 @@ MCM_special_var_register=
 MCM_special_var_notify=
 # TODO
 MCM_special_var_handler=
+# The user that will run the task.
+MCM_special_var_user=
 
 MCM_target_script_tail=
 
@@ -185,8 +187,13 @@ if [ $MCM_verbose -ge 2 ]; then
 fi
 
 # MCM_run_task is the core logic for the current task is printed to the
-# target script.  This is where the magic happens.  In summary, we are
-# doing the following:
+# target script.  This is where the magic happens.
+#
+# It receives two arguments:
+#  $1 -> module name
+#  $2 -> user that will run the task
+#
+# In summary, we are doing the following:
 #
 # 1.    run the test phase
 # 2.    if the test phase is successful
@@ -202,14 +209,14 @@ fi
 MCM_run_task ()
 {
 	MCM_ret=0
-	eval MCM_module_${1}_test || MCM_ret=$?
+	eval MCM_module_${1}_test "$2" || MCM_ret=$?
 	if [ "$MCM_ret" -eq 0 ]; then
 		MCM_state='ok'
 	elif [ "$MCM_mode" = 'test' ]; then
 		MCM_state='nok'
 	else
 		MCM_ret=0
-		eval MCM_module_$1_execute || MCM_ret=$?
+		eval MCM_module_$1_execute "$2" || MCM_ret=$?
 		if [ "$MCM_ret" -eq 0 ]; then
 			MCM_state='changed'
 		else
@@ -231,10 +238,18 @@ MCM_print_module_definition ()
 	local module="$1"
 	cat <<EOF
 
-# Definitions for module ${module}
+# Test phase for the module. Receives one parameter:
+#  $1 -> user that will run the code
 MCM_module_${module}_test ()
 {
-	/bin/sh \$MCM_xflag -eu << 'MCM_EOF__MCM_MCM_MCM'
+	# TODO: after running su, /bin/sh maybe cannot determine the current
+	# directory (in NetBSD we get error "sh: Cannot determine current
+	# working directory"). This is an ugly workaround because everybody
+	# should be able to open /tmp, but we should handle this is a more
+	# correct way.
+	cd /tmp
+
+	/usr/bin/su "\$1" -c "/bin/sh \$MCM_xflag -eu" << 'MCM_EOF__MCM_MCM_MCM'
 	if [ \$MCM_verbose -eq 0 ]; then
 		exec 1>"/dev/null"
 	fi
@@ -243,9 +258,18 @@ EOF
 	cat <<EOF
 MCM_EOF__MCM_MCM_MCM
 }
+# Execute phase for the module. Receives one parameter:
+#  $1 -> user that will run the code
 MCM_module_${module}_execute ()
 {
-	/bin/sh \$MCM_xflag -eu << 'MCM_EOF__MCM_MCM_MCM'
+	# TODO: after running su, /bin/sh maybe cannot determine the current
+	# directory (in NetBSD we get error "sh: Cannot determine current
+	# working directory"). This is an ugly workaround because everybody
+	# should be able to open /tmp, but we should handle this is a more
+	# correct way.
+	cd /tmp
+
+	/usr/bin/su "\$1" -c "/bin/sh \$MCM_xflag -eu" << 'MCM_EOF__MCM_MCM_MCM'
 	if [ \$MCM_verbose -eq 0 ]; then
 		exec 1>"/dev/null"
 	fi
@@ -268,7 +292,8 @@ MCM_print_task_logic ()
 	if [ -n "$cond_begin" ]; then
 		echo "$cond_begin"
 	fi
-	echo "MCM_run_task \"$module\""
+	: ${MCM_special_var_user:=\$(whoami)}
+	echo "MCM_run_task \"$module\"" "\"$MCM_special_var_user\""
 	if [ -n "$cond_end" ]; then
 		echo "$cond_end"
 	fi
@@ -462,6 +487,9 @@ MCM_set_special_var ()
 		;;
 	.handler)
 		MCM_special_var_handler="$value"
+		;;
+	.user)
+		MCM_special_var_user="$value"
 		;;
 	*)
 		MCM_fatal "Invalid special variable: \"$var\""
@@ -787,6 +815,7 @@ task ()
 	MCM_special_var_register=
 	MCM_special_var_notify=
 	MCM_special_var_handler=
+	MCM_special_var_user=
 
 	MCM_output=MCM_output
 }
