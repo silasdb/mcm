@@ -107,5 +107,5 @@ grep -q 'errors in crontab file' fakeeditor.out && {
 	exit 1
 }
 
-#rm fakeeditor
+rm fakeeditor
 rm fakeeditor.out
