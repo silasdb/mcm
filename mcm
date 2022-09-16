@@ -72,6 +72,8 @@ MCM_special_var_register=
 MCM_special_var_notify=
 # TODO
 MCM_special_var_handler=
+# Default user for tasks
+MCM_default_user='$(whoami)'
 # The user that will run the task.
 MCM_special_var_user=
 
@@ -292,7 +294,7 @@ MCM_print_task_logic ()
 	if [ -n "$cond_begin" ]; then
 		echo "$cond_begin"
 	fi
-	: ${MCM_special_var_user:=\$(whoami)}
+	: ${MCM_special_var_user:=$MCM_default_user}
 	echo "MCM_run_task \"$module\"" "\"$MCM_special_var_user\""
 	if [ -n "$cond_end" ]; then
 		echo "$cond_end"
