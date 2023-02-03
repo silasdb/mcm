@@ -12,28 +12,34 @@ sponge () {
 	echo "$x" > "$1"
 }
 
-sed -n '
-:start
-/^# MCM BLOCK BEGIN$/b inblock
-p
-n
-b start
+remove_block_from_file () {
+	sed -n '
+		:start
+		/^# MCM BLOCK BEGIN$/b inblock
+		p
+		n
+		b start
 
-:inblock
-/^# MCM BLOCK END$/b afterblock
-n
-b inblock
+		:inblock
+		/^# MCM BLOCK END$/b afterblock
+		n
+		b inblock
 
-:afterblock
-n
+		:afterblock
+		n
 
-:loop
-p
-n
-b loop
-' < "${path}" | {
+		:loop
+		p
+		n
+		b loop
+	' "$1"
+}
+
+append_block_to_stdin () {
 	cat
 	echo '# MCM BLOCK BEGIN'
 	echo "$block"
 	echo '# MCM BLOCK END'
-} | sponge "${path}"
+}
+
+remove_block_from_file "${path}" | append_block_to_stdin | sponge "${path}"

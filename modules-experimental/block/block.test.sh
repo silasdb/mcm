@@ -2,6 +2,7 @@
 
 sed_extract_block=''
 
+# Remove block from file
 test x"$(sed -n '
 :start
 /^# MCM BLOCK BEGIN$/b startblock
@@ -18,4 +19,4 @@ n
 b inblock
 :end
 q
-' < "${path}")" = x"${block}"
+' "${path}")" = x"${block}"
