@@ -1,0 +1,4 @@
+# Invalid special variables are silently ignored
+task substr_varname_module \
+	-test foo \
+	-test_abc bar
