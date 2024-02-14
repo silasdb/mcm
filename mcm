@@ -521,15 +521,30 @@ MCM_parameter ()
 	*) MCM_fatal "Unrecognized variable category: $var" ;;
 	esac
 
-	# Check if variable exist in lists
+	# Check if variable exist in lists. If variable exists in
+	# MCM_task_parameters_required, it is removed from it because we later
+	# check if MCM_task_parameters_required is empty, to make sure all
+	# required parameters were processed.
+	#
+	# Important implementation detail: MCM_task_parameters_required is a
+	# list of words separated by spaces, so we use spaces in our glob
+	# pattern below (*" $var2 "*). If we don't use spaces, we take the risk
+	# of it matching another variable which name is composed by $var2.  For
+	# instance, suppose $var2="foo" and $MCM_task_parameters_required=" abc
+	# foobar bla ", to not match "foo" against "foobar", we surround
+	# everything with spaces, that works as our delimiter. To make it work
+	# on the first and last words of the list, we also have a space around
+	# those as well (added in task function). That is why those list
+	# variables have a trailing space at the beginning and at the end.
 	case "${MCM_task_parameters_required}" in
-	*$var2*)
+	*" $var2 "*)
 		MCM_task_parameters_required="$(\
-			echo "$MCM_task_parameters_required" | sed "s/$var2//")"
+			echo "$MCM_task_parameters_required" | \
+			sed "s/ $var2 / /")"
 		;;
 	*)
 		case "${MCM_task_parameters_optional}" in
-		*$var2*)
+		*" $var2 "*)
 			;;
 		*)
 			MCM_fatal "Invalid parameter: \"$var2\""
@@ -767,12 +782,16 @@ task ()
 
 	# We make a shell-friendly list of required and optional parameters so
 	# we can detect user typos.
-	MCM_task_parameters_required="$(\
+	#
+	# Notice that we explicitly add a trailing space to the beginning and
+	# to the end of the list, to make it easier to handle it in
+	# MCM_parameter function. See MCM_parameter for details.
+	MCM_task_parameters_required=" $(\
 		grep ':required *$' "$modulepath/$module.parameters" \
-		| cut -d: -f1 | paste -d' ' -s -)"
-	MCM_task_parameters_optional="$(\
+		| cut -d: -f1 | paste -d' ' -s -) "
+	MCM_task_parameters_optional=" $(\
 		grep ':optional *$' "$modulepath/$module.parameters" \
-		| cut -d: -f1 | paste -d' ' -s -)"
+		| cut -d: -f1 | paste -d' ' -s -) "
 
 	# A list of parameters passed to this task.
 	local parameters_passed=
@@ -791,15 +810,11 @@ task ()
 
 	# As parameters are processed, they are removed from the
 	# MCM_task_parameters_* lists.  At the end,
-	# $MCM_task_parameters_required should be empty.
+	# $MCM_task_parameters_required should be a single space.
 
-	# Remove trailing white spaces.
-	MCM_task_parameters_required="${MCM_task_parameters_required## *}"
-	MCM_task_parameters_required="${MCM_task_parameters_required%% *}"
-
-	if [ -n "${MCM_task_parameters_required}" ]; then
+	if [ "${MCM_task_parameters_required}" != ' ' ]; then
 		msg="The following required parameters are not given:"
-		MCM_fatal "$msg \"$MCM_task_parameters_required\""
+		MCM_fatal "$msg $MCM_task_parameters_required"
 	fi
 
 	# Finally, embed the module logic.
