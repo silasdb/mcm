@@ -1,4 +1,4 @@
 make:optional
-makefile:required
+makefile:optional
 path:optional
 target:optional
