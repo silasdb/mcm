@@ -812,7 +812,10 @@ task ()
 	# MCM_task_parameters_* lists.  At the end,
 	# $MCM_task_parameters_required should be a single space.
 
-	if [ "${MCM_task_parameters_required}" != ' ' ]; then
+	MCM_task_parameters_required="$(\
+		echo "$MCM_task_parameters_required" | sed 's/^ *$//')"
+
+	if [ -n "${MCM_task_parameters_required}" ]; then
 		msg="The following required parameters are not given:"
 		MCM_fatal "$msg $MCM_task_parameters_required"
 	fi
