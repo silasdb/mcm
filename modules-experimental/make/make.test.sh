@@ -3,4 +3,4 @@
 if [ -n "${path+x}" ]; then
 	cd "$path"
 fi
-echo "$content" | "$make" -f - -q $target
+echo "$makefile" | "$make" -f - -q $target

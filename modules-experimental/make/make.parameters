@@ -1,4 +1,4 @@
-content:required
-target:optional
-path:optional
 make:optional
+makefile:required
+path:optional
+target:optional
