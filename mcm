@@ -124,6 +124,11 @@ MCM_use_colors='yes'
 
 export MCM_verbose=0
 
+# We first check where su lives, because in some systems, it is under /bin/su,
+# in other systems it is in /usr/bin/su.
+MCM_SU=/usr/bin/su
+test -x /bin/su && MCM_SU=/bin/su
+
 ### Private functions ###
 
 MCM_usage ()
@@ -251,7 +256,7 @@ MCM_module_${module}_test ()
 	# correct way.
 	cd /tmp
 
-	/usr/bin/su "\$1" -c "/bin/sh \$MCM_xflag -eu" << 'MCM_EOF__MCM_MCM_MCM'
+	"\$MCM_SU" "\$1" -c "/bin/sh \$MCM_xflag -eu" << 'MCM_EOF__MCM_MCM_MCM'
 	if [ \$MCM_verbose -eq 0 ]; then
 		exec 1>"/dev/null"
 	fi
@@ -271,7 +276,7 @@ MCM_module_${module}_execute ()
 	# correct way.
 	cd /tmp
 
-	/usr/bin/su "\$1" -c "/bin/sh \$MCM_xflag -eu" << 'MCM_EOF__MCM_MCM_MCM'
+	"\$MCM_SU" "\$1" -c "/bin/sh \$MCM_xflag -eu" << 'MCM_EOF__MCM_MCM_MCM'
 	if [ \$MCM_verbose -eq 0 ]; then
 		exec 1>"/dev/null"
 	fi
