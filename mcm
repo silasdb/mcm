@@ -233,6 +233,29 @@ MCM_run_task ()
 	fi
 }
 
+# Run a shell string received via standard input.
+#  $1 -> user that will run the code
+MCM_run_sh_user () {
+	# In some systems (BusyBox) calling su for the same user requires a
+	# password to be entered in the terminal. Since it is unacceptable
+	# for us, because mcm is non-interactive, we check if we want to
+	# run the command as the same logged user and, if so, just calls
+	# /bin/sh. I.e., it calls /bin/su only if we want to run the task
+	# as a different user (the login user is usually root).
+	if [ "$(whoami)" = "$1" ]; then
+		/bin/sh $MCM_xflag -eu
+	else
+		# TODO: after running su, /bin/sh maybe cannot determine the
+		# current directory (in NetBSD we get error "sh: Cannot
+		# determine current working directory"). This is an ugly
+		# workaround because everybody should be able to open /tmp, but
+		# we should handle this is a more correct way.
+		cd /tmp
+
+		"$MCM_SU" "$1" -c "/bin/sh \$MCM_xflag -eu"
+	fi
+}
+
 EOF
 }
 
@@ -249,14 +272,7 @@ MCM_print_module_definition ()
 #  $1 -> user that will run the code
 MCM_module_${module}_test ()
 {
-	# TODO: after running su, /bin/sh maybe cannot determine the current
-	# directory (in NetBSD we get error "sh: Cannot determine current
-	# working directory"). This is an ugly workaround because everybody
-	# should be able to open /tmp, but we should handle this is a more
-	# correct way.
-	cd /tmp
-
-	"\$MCM_SU" "\$1" -c "/bin/sh \$MCM_xflag -eu" << 'MCM_EOF__MCM_MCM_MCM'
+	MCM_run_sh_user "\$1" << 'MCM_EOF__MCM_MCM_MCM'
 	if [ \$MCM_verbose -eq 0 ]; then
 		exec 1>"/dev/null"
 	fi
@@ -269,14 +285,7 @@ MCM_EOF__MCM_MCM_MCM
 #  $1 -> user that will run the code
 MCM_module_${module}_execute ()
 {
-	# TODO: after running su, /bin/sh maybe cannot determine the current
-	# directory (in NetBSD we get error "sh: Cannot determine current
-	# working directory"). This is an ugly workaround because everybody
-	# should be able to open /tmp, but we should handle this is a more
-	# correct way.
-	cd /tmp
-
-	"\$MCM_SU" "\$1" -c "/bin/sh \$MCM_xflag -eu" << 'MCM_EOF__MCM_MCM_MCM'
+	MCM_run_sh_user "\$1" << 'MCM_EOF__MCM_MCM_MCM'
 	if [ \$MCM_verbose -eq 0 ]; then
 		exec 1>"/dev/null"
 	fi
