@@ -2,7 +2,7 @@
 
 : ${creates:=''}
 
-if [ -n "$creates" -a -d "$creates" ]; then
+if [ -e "$creates" ]; then
 	exit 0
 fi
 
