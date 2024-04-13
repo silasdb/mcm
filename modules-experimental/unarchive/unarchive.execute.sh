@@ -12,7 +12,7 @@ case "$src" in
 	unxz --decompress --stdout "$src" | tar xf - -C "$dest"
 	;;
 *)
-	echo >&2 "unarchive module cannot handle \"$ext\" extension."
+	echo >&2 "unarchive module cannot discover \"$src\" file format."
 	exit 1
 	;;
 esac
