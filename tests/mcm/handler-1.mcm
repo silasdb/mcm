@@ -1,6 +1,19 @@
-task dummy_module .msg 'handler A' -test_ret 1 .handler A
-handler B task dummy_module .msg 'handler B' -test_ret 1
+signal A \
+name dummy_module \
+task dummy_module -test_ret 1
 
-task dummy_module -test_ret 1 .notify A
-task dummy_module -test_ret 0 .notify B
-task dummy_module -test_ret 0 .notify A
+signal B \
+name dummy_module \
+task dummy_module -test_ret 0
+
+signal A \
+name dummy_module \
+task dummy_module -test_ret 0
+
+slot A \
+name 'handler A' \
+task dummy_module -test_ret 1
+
+slot B \
+name 'handler B' \
+task dummy_module -test_ret 1

@@ -60,14 +60,6 @@ MCM_task_parameters_optional=
 # parameters) to be printed when MCM_fatal is called.
 MCM_task_current_full=
 
-# Special variables for the current task.  This variables are set by the
-# MCM_set_special_var function and reset by the task function.
-# Condition for the current task.
-MCM_special_var_cond=
-# TODO
-MCM_special_var_notify=
-# TODO
-MCM_special_var_handler=
 # Default user for tasks
 MCM_default_user='$(whoami)'
 # The user that will run the task.
@@ -470,12 +462,6 @@ MCM_set_special_var ()
 	local var="$1"
 	local value="$2"
 	case "$var" in
-	.notify)
-		MCM_special_var_notify="$value"
-		;;
-	.handler)
-		MCM_special_var_handler="$value"
-		;;
 	.user)
 		MCM_special_var_user="$value"
 		;;
@@ -584,32 +570,7 @@ MCM_add_module_call ()
 	local module="$1"
 	local modulepath="$2"
 
-	# Sets variables for conditionals.  By default they are empty so they
-	# are expanded in the target script to nothing if MCM_special_var_cond
-	# is not set.
-	local cond_begin=
-	local cond_end=
-
-
-	if [ -n "$MCM_special_var_handler" ]; then
-		local v="\"\$MCM_handler_$MCM_special_var_handler\""
-		cond_begin="if [ $v = 'nok' -o $v = 'changed' ]; then"
-		cond_end='fi'
-	fi
-
 	$MCM_output "$(MCM_print_task_logic "$module")"
-
-	local x
-	for x in $MCM_special_var_notify; do
-		local v="\"\$MCM_handler_$x\""
-		local c="\"\${MCM_handler_$x+x}\""
-		$MCM_output "if [ -z $c ]; then"
-		$MCM_output " MCM_handler_$x=ok"
-		$MCM_output "fi"
-		$MCM_output "if [ $v != 'nok' -a $v != 'changed' ]; then"
-		$MCM_output " MCM_handler_$x=\$MCM_state"
-		$MCM_output "fi"
-	done
 }
 
 # The main function for this program.
@@ -686,9 +647,6 @@ MCM_main ()
 
 	echo "$MCM_target_script"
 
-	if [ -n "$MCM_target_script_tail" ]; then
-		echo 'echo "=> Calling handlers..."'
-	fi
 	echo "$MCM_target_script_tail"
 	echo "$(MCM_print_footer)"
 }
@@ -735,10 +693,6 @@ task ()
 	MCM_add_module_definition "$module"
 	MCM_set_special_vars "$@"
 	local name="$module"
-
-	if [ -n "$MCM_special_var_handler" ]; then
-		MCM_output=MCM_output_tail
-	fi
 
 	$MCM_output ''
 	$MCM_output "# ---- $name"
@@ -793,18 +747,9 @@ task ()
 	done
 
 	# Reset global variables.
-	MCM_special_var_cond=
-	MCM_special_var_notify=
-	MCM_special_var_handler=
 	MCM_special_var_user=
 
 	MCM_output=MCM_output
-}
-
-handler () {
-	local h="$1"
-	shift
-	"$@" .handler "$h"
 }
 
 name () {
@@ -851,6 +796,26 @@ cond () {
 		MCM_skipped=$((MCM_skipped+1))
 		MCM_print_state $MCM_state
 	}'
+}
+
+signal () {
+	local signal="$1"
+	shift
+	"$@"
+	$MCM_output ": \${MCM_slot_$signal:=ok}"
+	$MCM_output "if [ \$MCM_state = 'nok' -o \$MCM_state = 'changed' ]; then"
+	$MCM_output "MCM_slot_$signal=\$MCM_state"
+	$MCM_output 'fi'
+}
+
+slot () {
+	local slot="$1"
+	shift
+	local v="\$MCM_slot_$slot"
+	$MCM_output "echo =\> 'Running slot $slot'"
+	$MCM_output "if [ $v = 'nok' -o $v = 'changed' ]; then"
+	"$@"
+	$MCM_output "fi"
 }
 
 MCM_main "$@"
