@@ -1,7 +1,20 @@
 #!/bin/sh
 
-# TODO: check for other suffix other than .tar.gz
-
 : ${dest:=.}
 cd "$dest"
-tar zxvf "$src"
+
+ext="${src#*.}"
+
+case "$ext" in
+# TODO: zip
+gz|bz2)
+	tar zxvf "$src" -C "$dest"
+	;;
+xz)
+	unxz --decompress --stdout "$src" | tar xf - -C "$dest"
+	;;
+*)
+	echo >&2 "unarchive module cannot handle \"$ext\" extension."
+	exit 1
+	;;
+esac
