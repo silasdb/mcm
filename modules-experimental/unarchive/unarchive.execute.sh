@@ -3,14 +3,12 @@
 : ${dest:=.}
 cd "$dest"
 
-ext="${src#*.}"
-
-case "$ext" in
+case "$src" in
 # TODO: zip
-gz|bz2)
+*.tar.gz|*.tar.bz2)
 	tar zxvf "$src" -C "$dest"
 	;;
-xz)
+*.tar.xz)
 	unxz --decompress --stdout "$src" | tar xf - -C "$dest"
 	;;
 *)
