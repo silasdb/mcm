@@ -64,8 +64,6 @@ MCM_task_current_full=
 # MCM_set_special_var function and reset by the task function.
 # Condition for the current task.
 MCM_special_var_cond=
-# Register the current task sets.
-MCM_special_var_register=
 # TODO
 MCM_special_var_notify=
 # TODO
@@ -299,17 +297,9 @@ EOF
 MCM_print_task_logic ()
 {
 	local module="$1"
-	local cond_begin="$2"
-	local cond_end="$3"
 	echo "MCM_state='skipped'"
-	if [ -n "$cond_begin" ]; then
-		echo "$cond_begin"
-	fi
 	: ${MCM_special_var_user:=$MCM_default_user}
 	echo "MCM_run_task \"$module\"" "\"$MCM_special_var_user\""
-	if [ -n "$cond_end" ]; then
-		echo "$cond_end"
-	fi
 	# Sets internal counters so, at the end of the script, we know how many
 	# tasks are successful or not.
 	echo 'eval MCM_$MCM_state=$((MCM_$MCM_state+1))'
@@ -480,15 +470,6 @@ MCM_set_special_var ()
 	local var="$1"
 	local value="$2"
 	case "$var" in
-	.cond)
-		local cond="${value#raw:}"
-		if [ "$cond" = "$value" ]; then
-			# not raw cond
-			MCM_special_var_cond="$(MCM_cond_to_rawcond $cond)"
-		else
-			MCM_special_var_cond="$cond"
-		fi
-		;;
 	.notify)
 		MCM_special_var_notify="$value"
 		;;
@@ -616,13 +597,7 @@ MCM_add_module_call ()
 		cond_end='fi'
 	fi
 
-	if [ -n "$MCM_special_var_cond" ]; then
-		cond_begin="if $MCM_special_var_cond; then"
-		cond_end='fi'
-	fi
-
-	$MCM_output "$(MCM_print_task_logic "$module" \
-		"$cond_begin" "$cond_end")"
+	$MCM_output "$(MCM_print_task_logic "$module")"
 
 	local x
 	for x in $MCM_special_var_notify; do
@@ -850,6 +825,32 @@ register () {
 		$MCM_output "$(MCM_print_register "$MCM_special_var_register")"
 	fi
 	MCM_special_var_register=
+}
+
+cond () {
+	local value="$1"
+	shift
+	local cond="${value#raw:}"
+	if [ "$cond" = "$value" ]; then
+		# not raw cond
+		MCM_special_var_cond="$(MCM_cond_to_rawcond $cond)"
+	else
+		MCM_special_var_cond="$cond"
+	fi
+
+	if [ -n "$MCM_special_var_cond" ]; then
+		cond_begin="if $MCM_special_var_cond; then"
+		cond_end='fi'
+	fi
+
+	$MCM_output 'MCM_state=skipped'
+	$MCM_output "$cond_begin"
+	"$@"
+	$MCM_output "$cond_end"
+	$MCM_output 'test $MCM_state != "skipped" || {
+		MCM_skipped=$((MCM_skipped+1))
+		MCM_print_state $MCM_state
+	}'
 }
 
 MCM_main "$@"
