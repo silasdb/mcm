@@ -64,8 +64,6 @@ MCM_task_current_full=
 # MCM_set_special_var function and reset by the task function.
 # Condition for the current task.
 MCM_special_var_cond=
-# Message to be printed when current task is executed.
-MCM_special_var_msg=
 # Register the current task sets.
 MCM_special_var_register=
 # TODO
@@ -301,9 +299,8 @@ EOF
 MCM_print_task_logic ()
 {
 	local module="$1"
-	local name="$2"
-	local cond_begin="$3"
-	local cond_end="$4"
+	local cond_begin="$2"
+	local cond_end="$3"
 	echo "MCM_state='skipped'"
 	if [ -n "$cond_begin" ]; then
 		echo "$cond_begin"
@@ -492,12 +489,6 @@ MCM_set_special_var ()
 			MCM_special_var_cond="$cond"
 		fi
 		;;
-	.msg)
-		MCM_special_var_msg="$value"
-		;;
-	.register)
-		MCM_special_var_register="$value"
-		;;
 	.notify)
 		MCM_special_var_notify="$value"
 		;;
@@ -612,13 +603,6 @@ MCM_add_module_call ()
 	local module="$1"
 	local modulepath="$2"
 
-	# If the user passed the special variable .msg to the task, we print
-	# the value.  If not, we print the module's name.
-	local name="$module"
-	if [ -n "$MCM_special_var_msg" ]; then
-		name="$MCM_special_var_msg"
-	fi
-
 	# Sets variables for conditionals.  By default they are empty so they
 	# are expanded in the target script to nothing if MCM_special_var_cond
 	# is not set.
@@ -637,7 +621,7 @@ MCM_add_module_call ()
 		cond_end='fi'
 	fi
 
-	$MCM_output "$(MCM_print_task_logic "$module" "$MCM_special_var_msg" \
+	$MCM_output "$(MCM_print_task_logic "$module" \
 		"$cond_begin" "$cond_end")"
 
 	local x
@@ -651,12 +635,6 @@ MCM_add_module_call ()
 		$MCM_output " MCM_handler_$x=\$MCM_state"
 		$MCM_output "fi"
 	done
-
-	# Set a register value to the state of the task.  If the test is "nok",
-	# the content "changed" should be set instead.
-	if [ -n "$MCM_special_var_register" ]; then
-		$MCM_output "$(MCM_print_register "$MCM_special_var_register")"
-	fi
 }
 
 # The main function for this program.
@@ -787,12 +765,8 @@ task ()
 		MCM_output=MCM_output_tail
 	fi
 
-	if [ -n "$MCM_special_var_msg" ]; then
-		name="$MCM_special_var_msg"
-	fi
 	$MCM_output ''
 	$MCM_output "# ---- $name"
-	$MCM_output "echo \> $(MCM_quote "$name")"
 
 	# We make a shell-friendly list of required and optional parameters so
 	# we can detect user typos.
@@ -845,8 +819,6 @@ task ()
 
 	# Reset global variables.
 	MCM_special_var_cond=
-	MCM_special_var_msg=
-	MCM_special_var_register=
 	MCM_special_var_notify=
 	MCM_special_var_handler=
 	MCM_special_var_user=
@@ -858,6 +830,26 @@ handler () {
 	local h="$1"
 	shift
 	"$@" .handler "$h"
+}
+
+name () {
+	$MCM_output "echo \> $(MCM_quote "$1")"
+	shift
+	"$@"
+}
+
+register () {
+	local register="$1"
+	shift
+	MCM_special_var_register="$register"
+	"$@"
+
+	# Set a register value to the state of the task.  If the test is "nok",
+	# the content "changed" should be set instead.
+	if [ -n "$MCM_special_var_register" ]; then
+		$MCM_output "$(MCM_print_register "$MCM_special_var_register")"
+	fi
+	MCM_special_var_register=
 }
 
 MCM_main "$@"
