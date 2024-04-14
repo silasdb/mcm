@@ -8,7 +8,7 @@ export LANG=en_US
 # user shell.
 : ${SH:=/bin/sh}
 
-tmpdir="$(mktemp -d /tmp/.mcm.test.XXXX)"
+tmpdir="$(mktemp -d /tmp/.mcm.test.XXXXXX)"
 trap "rm -rf $tmpdir" 0 HUP INT QUIT TERM
 
 MCMHOME="$(readlink -f "$(dirname "$0")/../..")"
