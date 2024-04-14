@@ -34,6 +34,7 @@ tmp="$tmpdir/tmp"
 #
 
 cat > "$mcm" <<EOF
+name dummy_module \
 task dummy_module \
 	-test_out test_out \
 	-test_err test_err \
@@ -92,6 +93,7 @@ execute_err
 + exit 0" "$err"
 
 cat > "$mcm" <<EOF
+name dummy_module \
 task dummy_module \
 	-test_out test_out \
 	-test_err test_err \

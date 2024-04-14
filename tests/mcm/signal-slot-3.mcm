@@ -1,0 +1,33 @@
+# Signals and slots can be called hierarchically
+
+name dummy_module \
+signal parent \
+task dummy_module -test_ret 1
+
+# Parent emits two signals, A and B
+slot parent \
+signal 'A B' \
+name parent \
+task dummy_module -test_ret 1
+
+# Since our parent ran with nok status, slot A should be called
+slot A \
+name A \
+task dummy_module -test_ret 1
+
+# Slot B is also called, and emits two signals: C and D. D is just ignored, as
+# there is no further slot that captures D
+slot B \
+signal 'C D' \
+name B \
+task dummy_module -test_ret 0
+
+# C exists, but does not run, because the task that emitted C returned 'ok'.
+slot C \
+name C \
+task dummy_module -test_ret 0
+
+# This is just a signal that no body emits, so ignore it.
+slot invalid_slot \
+name invalid_slot \
+task dummy_module -test_ret 1

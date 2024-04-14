@@ -1,6 +1,6 @@
 # We can force an error (by setting execute_ret)
+name 'set a name' \
 task dummy_module \
-	.msg 'set a name' \
 	-test_ret 1 \
 	-execute_err error \
 	-execute_ret 1
