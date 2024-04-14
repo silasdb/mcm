@@ -125,6 +125,8 @@ MCM_usage ()
 
 MCM_print_state ()
 {
+	printf '%s' '=> '
+
 	# TODO: is '\e' a portable way to print Esc character?
 	if [ "$MCM_use_colors" = 'yes' ];  then
 		case "$1" in
@@ -135,7 +137,7 @@ MCM_print_state ()
 		esac
 	fi
 
-	printf '%s' "  [$1]"
+	printf '%s' "[$1]"
 
 	if [ "$MCM_use_colors" = 'yes' ];  then
 		printf '\e[0m'
@@ -659,22 +661,19 @@ task ()
 }
 
 name () {
-	$MCM_output "echo \> $(MCM_quote "$1")"
+	$MCM_output "printf '%s ' $(MCM_quote "$1") "
 	shift
 	"$@"
 }
 
 signal () {
-	local signals="$1"
+	local signal="$1"
 	shift
 	"$@"
-	local signal
-	for signal in $signals; do
-		$MCM_output ": \${MCM_slot_$signal:=ok}"
-		$MCM_output "if [ \$MCM_state = 'nok' -o \$MCM_state = 'changed' ]; then"
-		$MCM_output " MCM_slot_$signal=\$MCM_state"
-		$MCM_output 'fi'
-	done
+	$MCM_output ": \${MCM_slot_$signal:=ok}"
+	$MCM_output "if [ \$MCM_state = 'nok' -o \$MCM_state = 'changed' ]; then"
+	$MCM_output " MCM_slot_$signal=\$MCM_state"
+	$MCM_output 'fi'
 }
 
 slot () {
@@ -682,7 +681,7 @@ slot () {
 	shift
 	local v="\${MCM_slot_$slot-unset}"
 	$MCM_output "if [ $v = 'nok' -o $v = 'changed' ]; then"
-	$MCM_output "echo =\> 'Running slot $slot'"
+	$MCM_output "printf '(slot %s) ' '$slot'"
 	"$@"
 	$MCM_output "fi"
 }
