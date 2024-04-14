@@ -62,8 +62,6 @@ MCM_task_current_full=
 
 # Default user for tasks
 MCM_default_user='$(whoami)'
-# The user that will run the task.
-MCM_special_var_user=
 
 MCM_target_script_tail=
 
@@ -284,8 +282,7 @@ MCM_print_task_logic ()
 {
 	local module="$1"
 	echo "MCM_state='skipped'"
-	: ${MCM_special_var_user:=$MCM_default_user}
-	echo "MCM_run_task \"$module\"" "\"$MCM_special_var_user\""
+	echo "MCM_run_task \"$module\"" "\"$MCM_default_user\""
 	# Sets internal counters so, at the end of the script, we know how many
 	# tasks are successful or not.
 	echo 'eval MCM_$MCM_state=$((MCM_$MCM_state+1))'
@@ -395,27 +392,6 @@ MCM_show_module_help ()
 	fi
 
 	MCM_fatal "No documentation found for module $1.  Exit."
-}
-
-# Sets special variables.
-#
-# Parameters:
-# $1 -> Variable name
-# $2 -> Variable value.
-#
-# Side effects: Sets the MCM_special_var_* variables.
-MCM_set_special_var ()
-{
-	local var="$1"
-	local value="$2"
-	case "$var" in
-	.user)
-		MCM_special_var_user="$value"
-		;;
-	*)
-		MCM_fatal "Invalid special variable: \"$var\""
-		;;
-	esac
 }
 
 # Sets task parameters.
@@ -598,16 +574,6 @@ MCM_main ()
 	echo "$(MCM_print_footer)"
 }
 
-MCM_set_special_vars ()
-{
-	while [ $# -ne 0 ]; do
-		if [ "${1#.}" != "${1}" ]; then
-			MCM_set_special_var "$1" "$2"
-		fi
-		shift 2
-	done
-}
-
 ### Public functions ###
 
 raw ()
@@ -638,7 +604,6 @@ task ()
 	fi
 
 	MCM_add_module_definition "$module"
-	MCM_set_special_vars "$@"
 	local name="$module"
 
 	$MCM_output ''
@@ -662,9 +627,6 @@ task ()
 
 	# Process task parameters.
 	while [ $# -ne 0 ]; do
-		# We don't need to process special variables first, as we've
-		# already processed before with MCM_set_special_vars.  See
-		# above.
 		if [ "${1#.}" = "${1}" ]; then
 			MCM_parameter "$1" "$2"
 			parameters_passed="$parameters_passed ${1#?}"
@@ -692,9 +654,6 @@ task ()
 	for p in $parameters_passed; do
 		$MCM_output "unset $p"
 	done
-
-	# Reset global variables.
-	MCM_special_var_user=
 
 	MCM_output=MCM_output
 }
