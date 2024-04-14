@@ -665,21 +665,24 @@ name () {
 }
 
 signal () {
-	local signal="$1"
+	local signals="$1"
 	shift
 	"$@"
-	$MCM_output ": \${MCM_slot_$signal:=ok}"
-	$MCM_output "if [ \$MCM_state = 'nok' -o \$MCM_state = 'changed' ]; then"
-	$MCM_output "MCM_slot_$signal=\$MCM_state"
-	$MCM_output 'fi'
+	local signal
+	for signal in $signals; do
+		$MCM_output ": \${MCM_slot_$signal:=ok}"
+		$MCM_output "if [ \$MCM_state = 'nok' -o \$MCM_state = 'changed' ]; then"
+		$MCM_output " MCM_slot_$signal=\$MCM_state"
+		$MCM_output 'fi'
+	done
 }
 
 slot () {
 	local slot="$1"
 	shift
-	local v="\$MCM_slot_$slot"
-	$MCM_output "echo =\> 'Running slot $slot'"
+	local v="\${MCM_slot_$slot-unset}"
 	$MCM_output "if [ $v = 'nok' -o $v = 'changed' ]; then"
+	$MCM_output "echo =\> 'Running slot $slot'"
 	"$@"
 	$MCM_output "fi"
 }
