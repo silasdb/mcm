@@ -1,3 +1,0 @@
-task dummy_module \
-	.cond 'foo is x bla' \
-	-test_ret 0 

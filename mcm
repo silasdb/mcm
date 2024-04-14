@@ -147,12 +147,6 @@ MCM_print_state ()
 
 ### Public functions ###
 
-# Returns the value of a register.
-valueof ()
-{
-	eval echo \$"MCM_register_$1"
-}
-
 : ${MCM_OPTIONS:=''}
 
 set -- ${MCM_OPTIONS} "$@"
@@ -298,18 +292,6 @@ MCM_print_task_logic ()
 	echo 'MCM_print_state $MCM_state'
 }
 
-# Print register logic.
-MCM_print_register ()
-{
-	local register="$1"
-cat <<EOF
-if [ "\$MCM_state" = 'nok' ]; then
-	MCM_state=changed
-fi
-MCM_register_$register="\$MCM_state"
-EOF
-}
-
 # Print target script footer.
 MCM_print_footer ()
 {
@@ -413,41 +395,6 @@ MCM_show_module_help ()
 	fi
 
 	MCM_fatal "No documentation found for module $1.  Exit."
-}
-
-# Transforms an ordinary condition to a raw condition (suited for shell
-# evaluation).  The condition is passed expanded, so it can have either 3 or 4
-# parameters.
-#
-# Parameters:
-# Either $1 $2 $3    -> e.g.: foo is changed
-# Or     $1 $2 $3 $4 -> e.g.: foo is not changed
-#
-# Returns: the raw condition (suited for shell evaluation).
-MCM_cond_to_rawcond ()
-{
-	local register
-	local value
-	case "$#" in
-	3)
-		# With 3 words, we expect it to be in the form "var is value".
-		test "$2" = 'is' || MCM_fatal "Invalid condition: \"$*\""
-		register="$1"
-		value="$3"
-		;;
-	4)
-		# With 4 words, we expect it to be in the form "var is not
-		# value".
-		test "$2" = 'is' || MCM_fatal "Invalid condition: \"$*\""
-		test "$3" = 'not' || MCM_fatal "Invalid condition: \"$*\""
-		register="$1"
-		value="$4"
-		;;
-	*)
-		MCM_fatal "Invalid condition: \"$*\""
-		;;
-	esac
-	echo "[ \`valueof $register\` = '$value' ]"
 }
 
 # Sets special variables.
@@ -756,46 +703,6 @@ name () {
 	$MCM_output "echo \> $(MCM_quote "$1")"
 	shift
 	"$@"
-}
-
-register () {
-	local register="$1"
-	shift
-	MCM_special_var_register="$register"
-	"$@"
-
-	# Set a register value to the state of the task.  If the test is "nok",
-	# the content "changed" should be set instead.
-	if [ -n "$MCM_special_var_register" ]; then
-		$MCM_output "$(MCM_print_register "$MCM_special_var_register")"
-	fi
-	MCM_special_var_register=
-}
-
-cond () {
-	local value="$1"
-	shift
-	local cond="${value#raw:}"
-	if [ "$cond" = "$value" ]; then
-		# not raw cond
-		MCM_special_var_cond="$(MCM_cond_to_rawcond $cond)"
-	else
-		MCM_special_var_cond="$cond"
-	fi
-
-	if [ -n "$MCM_special_var_cond" ]; then
-		cond_begin="if $MCM_special_var_cond; then"
-		cond_end='fi'
-	fi
-
-	$MCM_output 'MCM_state=skipped'
-	$MCM_output "$cond_begin"
-	"$@"
-	$MCM_output "$cond_end"
-	$MCM_output 'test $MCM_state != "skipped" || {
-		MCM_skipped=$((MCM_skipped+1))
-		MCM_print_state $MCM_state
-	}'
 }
 
 signal () {
