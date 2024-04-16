@@ -102,7 +102,6 @@ export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin
 MCM_ok=0
 MCM_nok=0
 MCM_changed=0
-MCM_skipped=0
 MCM_mode='test'
 MCM_use_colors='yes'
 
@@ -130,7 +129,6 @@ MCM_print_state ()
 	# TODO: is '\e' a portable way to print Esc character?
 	if [ "$MCM_use_colors" = 'yes' ];  then
 		case "$1" in
-		skipped)	printf '\e[0;36m' ;;
 		ok)		printf '\e[0;32m' ;;
 		nok|changed)	printf '\e[0;33m' ;;
 		error)		printf '\e[0;31m' ;;
@@ -283,7 +281,6 @@ EOF
 MCM_print_task_logic ()
 {
 	local module="$1"
-	echo "MCM_state='skipped'"
 	echo "MCM_run_task \"$module\"" "\"$MCM_default_user\""
 	# Sets internal counters so, at the end of the script, we know how many
 	# tasks are successful or not.
@@ -296,9 +293,9 @@ MCM_print_footer ()
 {
 cat <<'EOF'
 if [ "$MCM_mode" = 'test' ]; then
-	echo "ok: $MCM_ok	nok: $MCM_nok	skipped: $MCM_skipped"
+	echo "ok: $MCM_ok	nok: $MCM_nok"
 else
-	echo "ok: $MCM_ok	changed: $MCM_changed	skipped: $MCM_skipped"
+	echo "ok: $MCM_ok	changed: $MCM_changed"
 fi
 EOF
 }
