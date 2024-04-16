@@ -412,7 +412,7 @@ MCM_parameter ()
 	case "$var" in
 	-*) var1=- ;;
 	+*) var1=+ ;;
-	*) MCM_fatal "Unrecognized variable category: $var" ;;
+	*) MCM_fatal "Invalid parameter: \"$var\"" ;;
 	esac
 
 	# Check if variable exist in lists. If variable exists in
@@ -457,9 +457,6 @@ MCM_parameter ()
 		fi
 		var="${1#+}"
 		value="$(cat "$value")"
-		;;
-	*)
-		MCM_fatal "Unrecognized variable category: $var2"
 		;;
 	esac
 	$MCM_output "export $var=$(MCM_quote "$value")"
@@ -626,10 +623,8 @@ task ()
 
 	# Process task parameters.
 	while [ $# -ne 0 ]; do
-		if [ "${1#.}" = "${1}" ]; then
-			MCM_parameter "$1" "$2"
-			parameters_passed="$parameters_passed ${1#?}"
-		fi
+		MCM_parameter "$1" "$2"
+		parameters_passed="$parameters_passed ${1#?}"
 		shift 2
 	done
 
