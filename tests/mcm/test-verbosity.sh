@@ -48,20 +48,18 @@ EOF
 # stderr is always shown.  stdout is not.
 ../../mcm -M modules "$mcm" | MCM_OPTIONS='-x' sh > "$out" 2>"$err"
 # test 1
-xdiff '> dummy_module
-  [changed]
-ok: 0	changed: 1	skipped: 0' "$out"
+xdiff 'dummy_module => [changed]
+ok: 0	changed: 1' "$out"
 test -s "$err"
 
 # verbose: 1
 # Always show both stderr and stdout.
 ../../mcm -M modules "$mcm" | MCM_OPTIONS='-x -v' sh >"$out" 2>"$err"
 # test 2
-xdiff '> dummy_module
-test_out
+xdiff 'dummy_module test_out
 execute_out
-  [changed]
-ok: 0	changed: 1	skipped: 0' "$out"
+=> [changed]
+ok: 0	changed: 1' "$out"
 # test 3
 xdiff 'test_err
 execute_err' "$err"
@@ -70,11 +68,10 @@ execute_err' "$err"
 # Show stderr and stdout of both test and execute phases and shell tracing.
 ../../mcm -M modules "$mcm" | MCM_OPTIONS='-x -vv' sh >"$out" 2>"$err"
 # test 4
-xdiff '> dummy_module
-test_out
+xdiff 'dummy_module test_out
 execute_out
-  [changed]
-ok: 0	changed: 1	skipped: 0' "$out"
+=> [changed]
+ok: 0	changed: 1' "$out"
 # test 5
 xdiff "+ '[' 2 -eq 0 ']'
 + test -n x
@@ -111,8 +108,7 @@ EOF
 # Always show stderr.
 ! ../../mcm -M modules "$mcm" | MCM_OPTIONS='-x' sh > "$out" 2>"$err"
 # test 6
-xdiff '> dummy_module
-  [error]' "$out"
+xdiff 'dummy_module => [error]' "$out"
 # test 7
 xdiff 'test_err
 execute_err' "$err"
@@ -121,10 +117,9 @@ execute_err' "$err"
 # Always show stderr and stdout.
 ! ../../mcm -M modules "$mcm" | MCM_OPTIONS='-x -v' sh >"$out" 2>"$err"
 # test 8
-xdiff '> dummy_module
-test_out
+xdiff 'dummy_module test_out
 execute_out
-  [error]' "$out"
+=> [error]' "$out"
 # test 9
 xdiff 'test_err
 execute_err' "$err"
@@ -133,10 +128,9 @@ execute_err' "$err"
 # Show stdout and stderr of both test and execute phases and shell tracing.
 ! ../../mcm -M modules "$mcm" | MCM_OPTIONS='-x -vv' sh >"$out" 2>"$err"
 # test 10
-xdiff '> dummy_module
-test_out
+xdiff 'dummy_module test_out
 execute_out
-  [error]' "$out"
+=> [error]' "$out"
 # test 11
 xdiff "+ '[' 2 -eq 0 ']'
 + test -n x
