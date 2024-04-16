@@ -668,7 +668,7 @@ notify () {
 	shift
 	"$@"
 	$MCM_output ": \${MCM_handler_$notification:=ok}"
-	$MCM_output "if [ \$MCM_state = 'nok' -o \$MCM_state = 'changed' ]; then"
+	$MCM_output "if [ \$MCM_state != 'ok' ]; then"
 	$MCM_output " MCM_handler_$notification=\$MCM_state"
 	$MCM_output 'fi'
 }
@@ -677,7 +677,7 @@ handler () {
 	local handler="$1"
 	shift
 	local v="\${MCM_handler_$handler-unset}"
-	$MCM_output "if [ $v = 'nok' -o $v = 'changed' ]; then"
+	$MCM_output "if [ $v != 'ok' ]; then"
 	$MCM_output "printf '(handler %s) ' '$handler'"
 	"$@"
 	$MCM_output "fi"
