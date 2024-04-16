@@ -1,15 +1,13 @@
 #!/bin/sh
 expected_test_out='
-> set a name
-  [nok]
-ok: 0	nok: 1	skipped: 0
+set a name => [nok]
+ok: 0	nok: 1
 '
 
 expected_execute_err='
 error
 '
 expected_execute_out='
-> set a name
-  [error]
+set a name => [error]
 '
 expected_execute_ret=1
