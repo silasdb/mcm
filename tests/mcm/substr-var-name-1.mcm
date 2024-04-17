@@ -1,5 +1,5 @@
-# Invalid special variables are silently ignored
-name substr_varname_module \
+# Check if test variable was not shadowed by test_abc variable. This is a test
+# for an old bug. See check-ins [00e8ec2711], [cb9cbf116b] and [41fd13f377]. 
 task substr_varname_module \
 	-test foo \
 	-test_abc bar
