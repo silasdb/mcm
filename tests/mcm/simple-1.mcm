@@ -1,1 +1,1 @@
-task dummy_module -test_ret 0
+name "x'a'%s\n" task dummy_module -test_ret 0
