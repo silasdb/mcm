@@ -60,22 +60,8 @@ MCM_task_parameters_optional=
 # parameters) to be printed when MCM_fatal is called.
 MCM_task_current_full=
 
-# Special variables for the current task.  This variables are set by the
-# MCM_set_special_var function and reset by the task function.
-# Condition for the current task.
-MCM_special_var_cond=
-# Message to be printed when current task is executed.
-MCM_special_var_msg=
-# Register the current task sets.
-MCM_special_var_register=
-# TODO
-MCM_special_var_notify=
-# TODO
-MCM_special_var_handler=
 # Default user for tasks
 MCM_default_user='$(whoami)'
-# The user that will run the task.
-MCM_special_var_user=
 
 MCM_target_script_tail=
 
@@ -116,7 +102,6 @@ export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin
 MCM_ok=0
 MCM_nok=0
 MCM_changed=0
-MCM_skipped=0
 MCM_mode='test'
 MCM_use_colors='yes'
 
@@ -139,17 +124,18 @@ MCM_usage ()
 
 MCM_print_state ()
 {
+	printf '%s' '=> '
+
 	# TODO: is '\e' a portable way to print Esc character?
 	if [ "$MCM_use_colors" = 'yes' ];  then
 		case "$1" in
-		skipped)	printf '\e[0;36m' ;;
 		ok)		printf '\e[0;32m' ;;
 		nok|changed)	printf '\e[0;33m' ;;
 		error)		printf '\e[0;31m' ;;
 		esac
 	fi
 
-	printf '%s' "  [$1]"
+	printf '%s' "[$1]"
 
 	if [ "$MCM_use_colors" = 'yes' ];  then
 		printf '\e[0m'
@@ -158,12 +144,6 @@ MCM_print_state ()
 }
 
 ### Public functions ###
-
-# Returns the value of a register.
-valueof ()
-{
-	eval echo \$"MCM_register_$1"
-}
 
 : ${MCM_OPTIONS:=''}
 
@@ -301,34 +281,11 @@ EOF
 MCM_print_task_logic ()
 {
 	local module="$1"
-	local name="$2"
-	local cond_begin="$3"
-	local cond_end="$4"
-	echo "MCM_state='skipped'"
-	if [ -n "$cond_begin" ]; then
-		echo "$cond_begin"
-	fi
-	: ${MCM_special_var_user:=$MCM_default_user}
-	echo "MCM_run_task \"$module\"" "\"$MCM_special_var_user\""
-	if [ -n "$cond_end" ]; then
-		echo "$cond_end"
-	fi
+	echo "MCM_run_task \"$module\"" "\"$MCM_default_user\""
 	# Sets internal counters so, at the end of the script, we know how many
 	# tasks are successful or not.
 	echo 'eval MCM_$MCM_state=$((MCM_$MCM_state+1))'
 	echo 'MCM_print_state $MCM_state'
-}
-
-# Print register logic.
-MCM_print_register ()
-{
-	local register="$1"
-cat <<EOF
-if [ "\$MCM_state" = 'nok' ]; then
-	MCM_state=changed
-fi
-MCM_register_$register="\$MCM_state"
-EOF
 }
 
 # Print target script footer.
@@ -336,9 +293,9 @@ MCM_print_footer ()
 {
 cat <<'EOF'
 if [ "$MCM_mode" = 'test' ]; then
-	echo "ok: $MCM_ok	nok: $MCM_nok	skipped: $MCM_skipped"
+	echo "ok: $MCM_ok	nok: $MCM_nok"
 else
-	echo "ok: $MCM_ok	changed: $MCM_changed	skipped: $MCM_skipped"
+	echo "ok: $MCM_ok	changed: $MCM_changed"
 fi
 EOF
 }
@@ -436,83 +393,6 @@ MCM_show_module_help ()
 	MCM_fatal "No documentation found for module $1.  Exit."
 }
 
-# Transforms an ordinary condition to a raw condition (suited for shell
-# evaluation).  The condition is passed expanded, so it can have either 3 or 4
-# parameters.
-#
-# Parameters:
-# Either $1 $2 $3    -> e.g.: foo is changed
-# Or     $1 $2 $3 $4 -> e.g.: foo is not changed
-#
-# Returns: the raw condition (suited for shell evaluation).
-MCM_cond_to_rawcond ()
-{
-	local register
-	local value
-	case "$#" in
-	3)
-		# With 3 words, we expect it to be in the form "var is value".
-		test "$2" = 'is' || MCM_fatal "Invalid condition: \"$*\""
-		register="$1"
-		value="$3"
-		;;
-	4)
-		# With 4 words, we expect it to be in the form "var is not
-		# value".
-		test "$2" = 'is' || MCM_fatal "Invalid condition: \"$*\""
-		test "$3" = 'not' || MCM_fatal "Invalid condition: \"$*\""
-		register="$1"
-		value="$4"
-		;;
-	*)
-		MCM_fatal "Invalid condition: \"$*\""
-		;;
-	esac
-	echo "[ \`valueof $register\` = '$value' ]"
-}
-
-# Sets special variables.
-#
-# Parameters:
-# $1 -> Variable name
-# $2 -> Variable value.
-#
-# Side effects: Sets the MCM_special_var_* variables.
-MCM_set_special_var ()
-{
-	local var="$1"
-	local value="$2"
-	case "$var" in
-	.cond)
-		local cond="${value#raw:}"
-		if [ "$cond" = "$value" ]; then
-			# not raw cond
-			MCM_special_var_cond="$(MCM_cond_to_rawcond $cond)"
-		else
-			MCM_special_var_cond="$cond"
-		fi
-		;;
-	.msg)
-		MCM_special_var_msg="$value"
-		;;
-	.register)
-		MCM_special_var_register="$value"
-		;;
-	.notify)
-		MCM_special_var_notify="$value"
-		;;
-	.handler)
-		MCM_special_var_handler="$value"
-		;;
-	.user)
-		MCM_special_var_user="$value"
-		;;
-	*)
-		MCM_fatal "Invalid special variable: \"$var\""
-		;;
-	esac
-}
-
 # Sets task parameters.
 #
 # Parameters:
@@ -532,7 +412,7 @@ MCM_parameter ()
 	case "$var" in
 	-*) var1=- ;;
 	+*) var1=+ ;;
-	*) MCM_fatal "Unrecognized variable category: $var" ;;
+	*) MCM_fatal "Invalid parameter: \"$var\"" ;;
 	esac
 
 	# Check if variable exist in lists. If variable exists in
@@ -578,9 +458,6 @@ MCM_parameter ()
 		var="${1#+}"
 		value="$(cat "$value")"
 		;;
-	*)
-		MCM_fatal "Unrecognized variable category: $var2"
-		;;
 	esac
 	$MCM_output "export $var=$(MCM_quote "$value")"
 }
@@ -612,51 +489,7 @@ MCM_add_module_call ()
 	local module="$1"
 	local modulepath="$2"
 
-	# If the user passed the special variable .msg to the task, we print
-	# the value.  If not, we print the module's name.
-	local name="$module"
-	if [ -n "$MCM_special_var_msg" ]; then
-		name="$MCM_special_var_msg"
-	fi
-
-	# Sets variables for conditionals.  By default they are empty so they
-	# are expanded in the target script to nothing if MCM_special_var_cond
-	# is not set.
-	local cond_begin=
-	local cond_end=
-
-
-	if [ -n "$MCM_special_var_handler" ]; then
-		local v="\"\$MCM_handler_$MCM_special_var_handler\""
-		cond_begin="if [ $v = 'nok' -o $v = 'changed' ]; then"
-		cond_end='fi'
-	fi
-
-	if [ -n "$MCM_special_var_cond" ]; then
-		cond_begin="if $MCM_special_var_cond; then"
-		cond_end='fi'
-	fi
-
-	$MCM_output "$(MCM_print_task_logic "$module" "$MCM_special_var_msg" \
-		"$cond_begin" "$cond_end")"
-
-	local x
-	for x in $MCM_special_var_notify; do
-		local v="\"\$MCM_handler_$x\""
-		local c="\"\${MCM_handler_$x+x}\""
-		$MCM_output "if [ -z $c ]; then"
-		$MCM_output " MCM_handler_$x=ok"
-		$MCM_output "fi"
-		$MCM_output "if [ $v != 'nok' -a $v != 'changed' ]; then"
-		$MCM_output " MCM_handler_$x=\$MCM_state"
-		$MCM_output "fi"
-	done
-
-	# Set a register value to the state of the task.  If the test is "nok",
-	# the content "changed" should be set instead.
-	if [ -n "$MCM_special_var_register" ]; then
-		$MCM_output "$(MCM_print_register "$MCM_special_var_register")"
-	fi
+	$MCM_output "$(MCM_print_task_logic "$module")"
 }
 
 # The main function for this program.
@@ -721,7 +554,7 @@ MCM_main ()
 		test -f "$MCM_source" || MCM_fatal "File \"$MCM_source\" not found"
 		. "$(readlink -f "$MCM_source")"
 	else
-		MCM_tmpfile="$(mktemp /tmp/mcm.XXXXX)"
+		MCM_tmpfile="$(mktemp /tmp/mcm.XXXXXX)"
 		trap "rm -f '$MCM_tmpfile'" 0 HUP INT QUIT TERM PIPE
 		cat > "$MCM_tmpfile"
 		. "$MCM_tmpfile"
@@ -733,21 +566,8 @@ MCM_main ()
 
 	echo "$MCM_target_script"
 
-	if [ -n "$MCM_target_script_tail" ]; then
-		echo 'echo "=> Calling handlers..."'
-	fi
 	echo "$MCM_target_script_tail"
 	echo "$(MCM_print_footer)"
-}
-
-MCM_set_special_vars ()
-{
-	while [ $# -ne 0 ]; do
-		if [ "${1#.}" != "${1}" ]; then
-			MCM_set_special_var "$1" "$2"
-		fi
-		shift 2
-	done
 }
 
 ### Public functions ###
@@ -780,19 +600,10 @@ task ()
 	fi
 
 	MCM_add_module_definition "$module"
-	MCM_set_special_vars "$@"
 	local name="$module"
 
-	if [ -n "$MCM_special_var_handler" ]; then
-		MCM_output=MCM_output_tail
-	fi
-
-	if [ -n "$MCM_special_var_msg" ]; then
-		name="$MCM_special_var_msg"
-	fi
 	$MCM_output ''
 	$MCM_output "# ---- $name"
-	$MCM_output "echo \> $(MCM_quote "$name")"
 
 	# We make a shell-friendly list of required and optional parameters so
 	# we can detect user typos.
@@ -812,13 +623,8 @@ task ()
 
 	# Process task parameters.
 	while [ $# -ne 0 ]; do
-		# We don't need to process special variables first, as we've
-		# already processed before with MCM_set_special_vars.  See
-		# above.
-		if [ "${1#.}" = "${1}" ]; then
-			MCM_parameter "$1" "$2"
-			parameters_passed="$parameters_passed ${1#?}"
-		fi
+		MCM_parameter "$1" "$2"
+		parameters_passed="$parameters_passed ${1#?}"
 		shift 2
 	done
 
@@ -843,21 +649,33 @@ task ()
 		$MCM_output "unset $p"
 	done
 
-	# Reset global variables.
-	MCM_special_var_cond=
-	MCM_special_var_msg=
-	MCM_special_var_register=
-	MCM_special_var_notify=
-	MCM_special_var_handler=
-	MCM_special_var_user=
-
 	MCM_output=MCM_output
 }
 
-handler () {
-	local h="$1"
+name () {
+	$MCM_output "printf '%s ' $(MCM_quote "$1") "
 	shift
-	"$@" .handler "$h"
+	"$@"
+}
+
+notify () {
+	local notification="$1"
+	shift
+	"$@"
+	$MCM_output ": \${MCM_handler_$notification:=ok}"
+	$MCM_output "if [ \$MCM_state = 'nok' -o \$MCM_state = 'changed' ]; then"
+	$MCM_output " MCM_handler_$notification=\$MCM_state"
+	$MCM_output 'fi'
+}
+
+handler () {
+	local handler="$1"
+	shift
+	local v="\${MCM_handler_$handler-unset}"
+	$MCM_output "if [ $v = 'nok' -o $v = 'changed' ]; then"
+	$MCM_output "printf '(handler %s) ' '$handler'"
+	"$@"
+	$MCM_output "fi"
 }
 
 MCM_main "$@"

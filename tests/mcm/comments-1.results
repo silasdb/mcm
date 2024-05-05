@@ -1,21 +1,17 @@
 #!/bin/sh
 expected_test_out='
-> dummy_module
-  [ok]
-> dummy_module
-  [nok]
-ok: 1	nok: 1	skipped: 0
+dummy_module => [ok]
+dummy_module => [nok]
+ok: 1	nok: 1
 '
 
 expected_execute_out='
-> dummy_module
-  [ok]
-> dummy_module
-# module comment
+dummy_module => [ok]
+dummy_module # module comment
 
  # other module comment (after a space)
 	# other module comment (after a tab)
  	# other module comment (after a space and a tab)
-  [changed]
-ok: 1	changed: 1	skipped: 0
+=> [changed]
+ok: 1	changed: 1
 '

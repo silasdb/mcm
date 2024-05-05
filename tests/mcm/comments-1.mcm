@@ -1,4 +1,7 @@
+name 'dummy_module' \
 task dummy_module -test_ret 0
+
+name 'dummy_module' \
 task dummy_module -test_ret 1 +execute_out - <<EOF
 # module comment
 

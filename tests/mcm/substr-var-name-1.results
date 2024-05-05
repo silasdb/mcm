@@ -1,16 +1,14 @@
 #!/bin/sh
 expected_test_out='
-> substr_varname_module
 foo
 bar
-  [ok]
-ok: 1	nok: 0	skipped: 0
+=> [ok]
+ok: 1	nok: 0
 '
 
 expected_execute_out='
-> substr_varname_module
 foo
 bar
-  [ok]
-ok: 1	changed: 0	skipped: 0
+=> [ok]
+ok: 1	changed: 0
 '

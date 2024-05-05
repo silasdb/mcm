@@ -1,6 +1,38 @@
-task dummy_module .msg 'handler A' -test_ret 1 .handler A
-handler B task dummy_module .msg 'handler B' -test_ret 1
+# Handlers can be called hierarchically
 
-task dummy_module -test_ret 1 .notify A
-task dummy_module -test_ret 0 .notify B
-task dummy_module -test_ret 0 .notify A
+name dummy_module \
+notify parent \
+task dummy_module -test_ret 1
+
+# Parent emits notify A
+handler parent \
+notify A \
+name parent \
+task dummy_module -test_ret 1
+
+# Since our parent ran with nok status, all tasks with handler A should be called
+
+handler A \
+notify B \
+name A \
+task dummy_module -test_ret 1
+
+handler A \
+notify C \
+name B \
+task dummy_module -test_ret 0
+
+# handler C exists, but does not run, because the task that emitted
+# C returned 'ok'.
+handler C \
+name C \
+task dummy_module -test_ret 0
+
+notify this_notify_doesnt_exist \
+name test_with_notify_that_doesnt_exist \
+task dummy_module -test_ret 0
+
+# This is just a notify that no body emits, so ignore it.
+handler invalid_handler \
+name invalid_handler \
+task dummy_module -test_ret 1

@@ -1,6 +1,6 @@
 #!/bin/sh
 expected_mcm_test_err='
-Invalid special variable: ".invalid_var"
+Invalid parameter: ".invalid_var"
 in task dummy_module -test_ret 1 .invalid_var this is a invalid special var -execute_ret 0
 '
 expected_mcm_execute_err="$expected_mcm_test_err"
