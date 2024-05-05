@@ -554,7 +554,7 @@ MCM_main ()
 		test -f "$MCM_source" || MCM_fatal "File \"$MCM_source\" not found"
 		. "$(readlink -f "$MCM_source")"
 	else
-		MCM_tmpfile="$(mktemp /tmp/mcm.XXXXX)"
+		MCM_tmpfile="$(mktemp /tmp/mcm.XXXXXX)"
 		trap "rm -f '$MCM_tmpfile'" 0 HUP INT QUIT TERM PIPE
 		cat > "$MCM_tmpfile"
 		. "$MCM_tmpfile"

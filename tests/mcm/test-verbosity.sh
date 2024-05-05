@@ -23,7 +23,7 @@ xdiff ()
 	xdiff_counter=$((xdiff_counter+1))
 }
 
-tmpdir="$(mktemp -d /tmp/.mcm.test.XXXX)"
+tmpdir="$(mktemp -d /tmp/.mcm.test.XXXXXX)"
 mcm="$tmpdir/mcm"
 out="$tmpdir/out"
 err="$tmpdir/err"
