@@ -1,25 +1,17 @@
 #!/bin/sh
 expected_test_out='
-> f\o"o
-  [ok]
-> dummy_module
-  [nok]
-> dummy_module
-  [nok]
-> ba'"'"'r
-  [nok]
-ok: 1	nok: 3	skipped: 0
+f\o"o => [ok]
+dummy_module => [nok]
+dummy_module => [nok]
+ba'"'"'r => [nok]
+ok: 1	nok: 3
 '
 
 expected_execute_out='
-> f\o"o
-  [ok]
-> dummy_module
-  [changed]
-> dummy_module
-    spaces before and     after    
-  [changed]
-> ba'"'"'r
-  [changed]
-ok: 1	changed: 3	skipped: 0
+f\o"o => [ok]
+dummy_module => [changed]
+dummy_module     spaces before and     after    
+=> [changed]
+ba'"'"'r => [changed]
+ok: 1	changed: 3
 '

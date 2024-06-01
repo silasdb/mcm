@@ -1,10 +1,10 @@
 #!/bin/sh
 expected_test_out='
-  [ok]
-ok: 1	nok: 0	skipped: 0
+x'"'"'a'"'"'%s\n => [ok]
+ok: 1	nok: 0
 '
 
 expected_execute_out='
-  [ok]
-ok: 1	changed: 0	skipped: 0
+x'"'"'a'"'"'%s\n => [ok]
+ok: 1	changed: 0
 '
