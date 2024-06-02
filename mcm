@@ -564,10 +564,9 @@ MCM_main ()
 		exec 1>"$MCM_destination"
 	fi
 
-	echo "$MCM_target_script"
-
-	echo "$MCM_target_script_tail"
-	echo "$(MCM_print_footer)"
+	printf '%s\n' "$MCM_target_script"
+	printf '%s\n' "$MCM_target_script_tail"
+	printf '%s\n' "$(MCM_print_footer)"
 }
 
 ### Public functions ###
