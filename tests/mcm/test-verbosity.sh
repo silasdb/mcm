@@ -75,17 +75,17 @@ ok: 0	changed: 1' "$out"
 # test 5
 xdiff "+ '[' 2 -eq 0 ']'
 + test -n x
-+ echo test_out
++ printf '%s\n' test_out
 + test -n x
-+ echo test_err >&2
++ printf '%s\n' test_err >&2
 test_err
 + exit 1
 + '[' 2 -eq 0 ']'
 + ':' 0
 + test -n x
-+ echo execute_out
++ printf '%s\n' execute_out
 + test -n x
-+ echo execute_err >&2
++ printf '%s\n' execute_err >&2
 execute_err
 + exit 0" "$err"
 
@@ -134,16 +134,16 @@ execute_out
 # test 11
 xdiff "+ '[' 2 -eq 0 ']'
 + test -n x
-+ echo test_out
++ printf '%s\n' test_out
 + test -n x
-+ echo test_err >&2
++ printf '%s\n' test_err >&2
 test_err
 + exit 1
 + '[' 2 -eq 0 ']'
 + ':' 1
 + test -n x
-+ echo execute_out
++ printf '%s\n' execute_out
 + test -n x
-+ echo execute_err >&2
++ printf '%s\n' execute_err >&2
 execute_err
 + exit 1" "$err"
