@@ -59,17 +59,17 @@ case "$t" in
 	# 	foo
 	# 	'
 
-	echo "$expected_mcm_execute_err" | sed -n -e '$d' -e '2,$p' \
+	printf '%s\n' "$expected_mcm_execute_err" | sed -n -e '$d' -e '2,$p' \
 		> "$tmpdir/expected_mcm_execute_err"
-	echo "$expected_mcm_test_err" | sed -n -e '$d' -e '2,$p' \
+	printf '%s\n' "$expected_mcm_test_err" | sed -n -e '$d' -e '2,$p' \
 		> "$tmpdir/expected_mcm_test_err"
-	echo "$expected_test_out" | sed -n -e '$d' -e '2,$p' \
+	printf '%s\n' "$expected_test_out" | sed -n -e '$d' -e '2,$p' \
 		> "$tmpdir/expected_test_out"
-	echo "$expected_test_err" | sed -n -e '$d' -e '2,$p' \
+	printf '%s\n' "$expected_test_err" | sed -n -e '$d' -e '2,$p' \
 		> "$tmpdir/expected_test_err"
-	echo "$expected_execute_out" | sed -n -e '$d' -e '2,$p' \
+	printf '%s\n' "$expected_execute_out" | sed -n -e '$d' -e '2,$p' \
 		> "$tmpdir/expected_execute_out"
-	echo "$expected_execute_err" | sed -n -e '$d' -e '2,$p' \
+	printf '%s\n' "$expected_execute_err" | sed -n -e '$d' -e '2,$p' \
 		> "$tmpdir/expected_execute_err"
 
 	this_failed=0
