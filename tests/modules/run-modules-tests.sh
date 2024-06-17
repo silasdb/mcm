@@ -39,9 +39,9 @@ do_test ()
 	test "$sandbox" = 'yes' && sh "$sandbox_handler" create
 
 	test="$(basename "$prefix")"
-	testdir="$(echo 'mktemp -d /tmp/.mcm.testdir.XXXX' | $run_sh)"
+	testdir="$(echo 'mktemp -d /tmp/.mcm.testdir.XXXXXX' | $run_sh)"
 	test -n "$testdir" # Because last command can fail if ssh fails
-	tmpout="$(mktemp /tmp/.mcm.test.out.XXXX)"
+	tmpout="$(mktemp /tmp/.mcm.test.out.XXXXXX)"
 	t="$(basename "$prefix")"
 	mcm_in="${test}.mcm.in"
 	sh_in="${test}.sh.in"
