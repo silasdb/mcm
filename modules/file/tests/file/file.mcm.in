@@ -1,15 +1,15 @@
+name 'test file creation - one line with quotes' \
 task file \
-	.name 'test file creation - one line with quotes' \
 	-path '@testdir@/a_file' \
 	-content "test1 'single quote \"   double quote with trailing spaces at the end   "
 
+name 'test file creation - two single quotes' \
 task file \
-	.name 'test file creation - two single quotes' \
 	-path '@testdir@/other_file' \
 	-content "test1 'single quote and then another ' single quote"
 
+name 'test file creation - multiple lines' \
 task file \
-	.name 'test file creation - multiple lines' \
 	-path '@testdir@/file name with spaces' \
 	+content - <<-'EOF'
 
@@ -27,31 +27,31 @@ task file \
 
 	EOF
 
+name 'file permissions test' \
 task file \
-	.name 'file permissions test' \
 	-path @testdir@/file0644 \
 	-mode 0644 \
 	-content ''
 
+name 'file permissions test' \
 task file \
-	.name 'file permissions test' \
 	-path @testdir@/file0755 \
 	-content '' \
 	-mode 0755
 
+name 'file permissions test' \
 task file \
-	.name 'file permissions test' \
 	-path @testdir@/file0755 \
 	-content '' \
 	-mode 755
 
+name 'file permissions test' \
 task file \
-	.name 'file permissions test' \
 	-path @testdir@/file0755 \
 	-content bla \
 	-mode 644
 
+name 'file permissions test' \
 task file \
-	.name 'file permissions test' \
 	-path @testdir@/file0755 \
 	-mode 0755
