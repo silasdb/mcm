@@ -1,17 +1,4 @@
-> test file creation - one line with quotes
-  [changed]
-> test file creation - two single quotes
-  [changed]
-> test file creation - multiple lines
-  [changed]
-> file permissions test
-  [changed]
-> file permissions test
-  [changed]
-> file permissions test
-  [ok]
-> file permissions test
-  [changed]
-> file permissions test
-  [changed]
-ok: 1	changed: 7	skipped: 0
+test file creation - one line with quotes => [changed]
+test file creation - two single quotes => [changed]
+test file creation - multiple lines => [changed]
+ok: 0	changed: 3

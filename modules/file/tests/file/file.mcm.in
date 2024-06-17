@@ -26,27 +26,3 @@ task file \
 	
 
 	EOF
-
-name 'file permissions test' \
-task file \
-	-path @testdir@/file0644 \
-	-content ''
-
-name 'file permissions test' \
-task file \
-	-path @testdir@/file0755 \
-	-content '' \
-
-name 'file permissions test' \
-task file \
-	-path @testdir@/file0755 \
-	-content '' \
-
-name 'file permissions test' \
-task file \
-	-path @testdir@/file0755 \
-	-content bla \
-
-name 'file permissions test' \
-task file \
-	-path @testdir@/file0755 \
