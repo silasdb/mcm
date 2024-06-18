@@ -32,7 +32,7 @@ task file \
 	-path '@testdir@/template-eol-yes--check-eol-not' \
 	-content "abc"
 
-name 'template has EOF, but target (check) file does not' \
+name 'both template and target (check) file dont end with EOL' \
 task file \
-	-path '@testdir@/template-eol-not--check-eol-yes' \
+	-path '@testdir@/not-eol' \
 	+content @testdir@/no-eol.file.txt

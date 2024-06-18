@@ -24,6 +24,5 @@ diff -u '@testdir@/file name with spaces' '@testdir@/file name with spaces.check
 printf 'abc' >'@testdir@/template-eol-yes--check-eol-not.check'
 ! cmp -s '@testdir@/template-eol-yes--check-eol-not' '@testdir@/template-eol-yes--check-eol-not.check'
 
-# This is expected to fail, so we negate (!) it.
-echo 'abc' >'@testdir@/template-eol-not--check-eol-yes.check'
-! diff -u '@testdir@/template-eol-not--check-eol-yes' '@testdir@/template-eol-not--check-eol-yes.check'
+printf 'abc' >'@testdir@/not-eol.check'
+diff -u '@testdir@/not-eol' '@testdir@/not-eol.check'
