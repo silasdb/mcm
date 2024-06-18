@@ -26,3 +26,13 @@ task file \
 	
 
 	EOF
+
+name 'template doesnt have EOF, but target (check) file does' \
+task file \
+	-path '@testdir@/template-eol-yes--check-eol-not' \
+	-content "abc"
+
+name 'template has EOF, but target (check) file does not' \
+task file \
+	-path '@testdir@/template-eol-not--check-eol-yes' \
+	+content @testdir@/no-eol.file.txt

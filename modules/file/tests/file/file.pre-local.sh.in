@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Manually copy no-eol.file.txt to @testdir@. no-eol.file.txt is a normal text
+# file, that doesn't end with \n. We cannot create such file from within mcm,
+# so we need to keep it separated.
+cp no-eol.file.txt @testdir@/no-eol.file.txt
