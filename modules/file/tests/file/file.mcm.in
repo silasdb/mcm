@@ -35,4 +35,5 @@ task file \
 name 'both template and target (check) file dont end with EOL' \
 task file \
 	-path '@testdir@/not-eol' \
+	-eofchar '' \
 	+content @testdir@/no-eol.file.txt

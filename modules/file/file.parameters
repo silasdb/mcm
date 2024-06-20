@@ -1,3 +1,4 @@
 content:optional
+eofchar:optional
 force:optional
 path:required
