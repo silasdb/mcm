@@ -1,6 +1,7 @@
 test file creation - one line with quotes => [changed]
 test file creation - two single quotes => [changed]
 test file creation - multiple lines => [changed]
-template doesnt have EOF, but target (check) file does => [changed]
+template doesnt end with EOL, but target (check) file does => [changed]
+template does end with EOL, but target (check) file does not => [changed]
 both template and target (check) file dont end with EOL => [changed]
-ok: 0	changed: 5
+ok: 0	changed: 6

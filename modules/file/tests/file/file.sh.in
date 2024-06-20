@@ -1,4 +1,6 @@
 #!/bin/sh
+set -eu
+
 echo "test1 'single quote \"   double quote with trailing spaces at the end   " > @testdir@/a_file.check
 diff -u @testdir@/a_file.check @testdir@/a_file
 
@@ -21,8 +23,13 @@ EOF
 diff -u '@testdir@/file name with spaces' '@testdir@/file name with spaces.check'
 
 # This is expected to fail, so we negate (!) it.
+printf 'abc\n' >'@testdir@/template-eol-not--check-eol-yes.check'
+! ! cmp -s '@testdir@/template-eol-not--check-eol-yes' '@testdir@/template-eol-not--check-eol-yes.check'
+test $? = 1
+
 printf 'abc' >'@testdir@/template-eol-yes--check-eol-not.check'
-! cmp -s '@testdir@/template-eol-yes--check-eol-not' '@testdir@/template-eol-yes--check-eol-not.check'
+! ! cmp -s '@testdir@/template-eol-yes--check-eol-not' '@testdir@/template-eol-yes--check-eol-not.check'
+test $? = 1
 
 printf 'abc' >'@testdir@/not-eol.check'
 diff -u '@testdir@/not-eol' '@testdir@/not-eol.check'
