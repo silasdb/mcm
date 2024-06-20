@@ -1,15 +1,15 @@
 name 'test file creation - one line with quotes' \
-task file \
+task textfile \
 	-path '@testdir@/a_file' \
 	-content "test1 'single quote \"   double quote with trailing spaces at the end   "
 
 name 'test file creation - two single quotes' \
-task file \
+task textfile \
 	-path '@testdir@/other_file' \
 	-content "test1 'single quote and then another ' single quote"
 
 name 'test file creation - multiple lines' \
-task file \
+task textfile \
 	-path '@testdir@/file name with spaces' \
 	+content - <<-'EOF'
 
@@ -28,18 +28,18 @@ task file \
 	EOF
 
 name 'template doesnt end with EOL, but target (check) file does' \
-task file \
+task textfile \
 	-path '@testdir@/template-eol-not--check-eol-yes' \
 	-eofchar '' \
 	+content @testdir@/no-eol.file.txt
 
 name 'template does end with EOL, but target (check) file does not' \
-task file \
+task textfile \
 	-path '@testdir@/template-eol-yes--check-eol-not' \
 	-content "abc"
 
 name 'both template and target (check) file dont end with EOL' \
-task file \
+task textfile \
 	-path '@testdir@/not-eol' \
 	-eofchar '' \
 	+content @testdir@/no-eol.file.txt
