@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# TODO: don't use $PWD here. Create a temporary directory instead.
 # TODO: check if time_spec is set?
 
 uflag=
