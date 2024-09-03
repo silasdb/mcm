@@ -8,12 +8,6 @@ if [ -n "${user+x}" ]; then
 	uflag="-u ${user}"
 fi
 
-quote ()
-{
-	local q="$*"
-	printf "%s" "$*" | sed "s/'/'\\\''/g"
-}
-
 # If such entry doesn't exist in crontab, just append it.
 if ! crontab $uflag -l | grep -q -x -F "# MCM: $name"; then
 	# If the register is not added, just appends it at the end of the
@@ -21,7 +15,7 @@ if ! crontab $uflag -l | grep -q -x -F "# MCM: $name"; then
 	{
 		crontab -l
 		echo "# MCM: $name"
-		echo "$(quote "$time_spec")" "$(quote "$job")"
+		echo "$time_spec $job"
 	} | crontab -
 	exit
 fi
@@ -39,5 +33,5 @@ fi
 			n
 	"
 	echo "# MCM: $name"
-	echo "$(quote "$time_spec")" "$(quote "$job")"
+	echo "$time_spec $job"
 } | crontab -
