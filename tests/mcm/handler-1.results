@@ -5,7 +5,8 @@ dummy_module => [nok]
 (handler A) A => [nok]
 (handler A) B => [ok]
 test_with_notify_that_doesnt_exist => [ok]
-ok: 2	nok: 3
+mytask => [nok]
+ok: 2	nok: 4
 '
 
 expected_execute_out='
@@ -14,5 +15,6 @@ dummy_module => [changed]
 (handler A) A => [changed]
 (handler A) B => [ok]
 test_with_notify_that_doesnt_exist => [ok]
-ok: 2	changed: 3
+mytask => [changed]
+ok: 2	changed: 4
 '

@@ -36,3 +36,13 @@ task dummy_module -test_ret 0
 handler invalid_handler \
 name invalid_handler \
 task dummy_module -test_ret 1
+
+# If a handler is declared before notify, it is never ran. This case is
+# probably an error commited by the user.
+handler notexecuted \
+name notexecuted \
+task dummy_module -test_ret 1
+
+name mytask \
+notify notexecuted \
+task dummy_module -test_ret 1
