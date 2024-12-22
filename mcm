@@ -577,7 +577,7 @@ MCM_main ()
 
 raw ()
 {
-	MCM_target_script="${MCM_target_script}$(cat)${MCM_NL}"
+	MCM_target_script_body="${MCM_target_script_body}$(cat)${MCM_NL}"
 }
 
 # The most important public function that define new tasks to be added to the
