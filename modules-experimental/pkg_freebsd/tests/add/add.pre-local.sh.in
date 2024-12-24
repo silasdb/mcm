@@ -1,0 +1,17 @@
+#!/bin/sh
+
+mkdir '@testdir@/mocks'
+
+echo '
+#!/bin/sh
+exit 0
+' > "@testdir@/mocks/pkg_add"
+
+chmod 755 "@testdir@/mocks/pkg_add"
+
+echo '
+#!/bin/sh
+exit 0
+' > "@testdir@/mocks/pkg_info"
+
+chmod 755 "@testdir@/mocks/pkg_info"
