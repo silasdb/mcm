@@ -21,11 +21,9 @@
 
 set -eu
 
-MCM_target_script=
-
 MCM_output ()
 {
-	MCM_target_script="${MCM_target_script}$*${MCM_NL}"
+	printf '%s\n' "$*"
 }
 
 ### Constants ###
@@ -558,7 +556,6 @@ MCM_main ()
 		exec 1>"$MCM_destination"
 	fi
 
-	printf '%s\n' "$MCM_target_script"
 	printf '%s\n' "$(MCM_print_footer)"
 }
 
@@ -566,7 +563,8 @@ MCM_main ()
 
 raw ()
 {
-	MCM_target_script="${MCM_target_script}$(cat)${MCM_NL}"
+	cat
+	printf '\n'
 }
 
 # The most important public function that define new tasks to be added to the
