@@ -28,10 +28,6 @@ MCM_output ()
 	MCM_target_script="${MCM_target_script}$*${MCM_NL}"
 }
 
-MCM_output_tail () {
-	MCM_target_script_tail="${MCM_target_script_tail}${MCM_NL}$*"
-}
-
 ### Constants ###
 
 # A newline character
@@ -62,8 +58,6 @@ MCM_task_current_full=
 
 # Default user for tasks
 MCM_default_user='$(whoami)'
-
-MCM_target_script_tail=
 
 # The version of mcm.  If it is "something"-devel, it is an unstable version
 # downloaded from the source version control.
@@ -565,7 +559,6 @@ MCM_main ()
 	fi
 
 	printf '%s\n' "$MCM_target_script"
-	printf '%s\n' "$MCM_target_script_tail"
 	printf '%s\n' "$(MCM_print_footer)"
 }
 
