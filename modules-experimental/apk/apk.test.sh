@@ -1,1 +1,1 @@
-apk list -I | grep -w $name
+apk info -e "$name"
