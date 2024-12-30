@@ -22,10 +22,15 @@
 set -eu
 
 MCM_target_script=
+MCM_tasks_definitions=
 
 MCM_output ()
 {
 	MCM_target_script="${MCM_target_script}$*${MCM_NL}"
+}
+
+MCM_task_definition () {
+	MCM_tasks_definitions="${MCM_tasks_definitions}$*$MCM_NL"
 }
 
 ### Constants ###
@@ -461,9 +466,7 @@ MCM_add_module_definition ()
 	local module="$1"
 	# We first prevent the module code from being inserted twice.
 	if ! echo "$MCM_modules_loaded" | grep -q -w "$module"; then
-		# We now define two functions to the target script that contains
-		# the test and execute phases.
-		$MCM_output "$(MCM_print_module_definition "$module")"
+		MCM_task_definition "$(MCM_print_module_definition "$module")"
 
 		# Add loaded modules to the MCM_modules_loaded variable so we
 		# prevent it from being loaded again.
@@ -558,6 +561,7 @@ MCM_main ()
 		exec 1>"$MCM_destination"
 	fi
 
+	printf '%s\n' "$MCM_tasks_definitions"
 	printf '%s\n' "$MCM_target_script"
 	printf '%s\n' "$(MCM_print_footer)"
 }

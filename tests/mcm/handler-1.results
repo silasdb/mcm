@@ -1,18 +1,22 @@
 #!/bin/sh
 expected_test_out='
+dummy_module => [ok]
+can we use dummy_module_2? => [nok]
 dummy_module => [nok]
 (handler parent) parent => [nok]
 (handler A) A => [nok]
 (handler A) B => [ok]
 test_with_notify_that_doesnt_exist => [ok]
-ok: 2	nok: 3
+ok: 3	nok: 4
 '
 
 expected_execute_out='
+dummy_module => [ok]
+can we use dummy_module_2? => [changed]
 dummy_module => [changed]
 (handler parent) parent => [changed]
 (handler A) A => [changed]
 (handler A) B => [ok]
 test_with_notify_that_doesnt_exist => [ok]
-ok: 2	changed: 3
+ok: 3	changed: 4
 '

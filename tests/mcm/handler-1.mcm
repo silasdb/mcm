@@ -1,4 +1,25 @@
+#
+# First we test if dummy_module_2 is correctly declared, even if
+# it is not used in the first handler. Old versions of mcm had a bug
+# that prevent user from using a module if it was first used in a
+# handler that was not triggered. So we test this case.
+#
+
+name dummy_module \
+notify myhandler \
+task dummy_module -test_ret 0
+
+# This handler is never triggered.
+handler myhandler \
+task dummy_module_2 -test_ret 0
+
+# Can we use dummy_module_2?
+name 'can we use dummy_module_2?' \
+task dummy_module_2 -test_ret 1
+
+#
 # Handlers can be called hierarchically
+#
 
 name dummy_module \
 notify parent \
