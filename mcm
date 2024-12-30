@@ -568,6 +568,13 @@ MCM_main ()
 
 ### Public functions ###
 
+include () {
+	local oldpwd="$PWD"
+	cd "$(dirname "$1")"
+	. ./"$(basename "$1")"
+	cd "$oldpwd"
+}
+
 raw ()
 {
 	MCM_target_script="${MCM_target_script}$(cat)${MCM_NL}"
