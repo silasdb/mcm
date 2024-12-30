@@ -541,7 +541,7 @@ MCM_main ()
 		MCM_usage
 	fi
 
-	$MCM_output "$(MCM_print_header)"
+	printf '%s\n' "$(MCM_print_header)"
 
 	# Embed the user script that calls task and other public functions.
 	if [ "$MCM_source" != '-' ]; then
