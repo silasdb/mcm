@@ -21,12 +21,19 @@
 
 set -eu
 
-MCM_target_script=
+MCM_target_script_modules=
+MCM_target_script_body=
+MCM_target_script_tail=
 MCM_tasks_definitions=
 
-MCM_output ()
+MCM_output_module ()
 {
-	MCM_target_script="${MCM_target_script}$*${MCM_NL}"
+	MCM_target_script_modules="${MCM_target_script_modules}$*${MCM_NL}"
+}
+
+MCM_output_body ()
+{
+	MCM_target_script_body="${MCM_target_script_body}$*${MCM_NL}"
 }
 
 MCM_task_definition () {
@@ -47,9 +54,6 @@ MCM_modules_PATH=
 
 # A list of modules loaded to the target script.
 MCM_modules_loaded=
-
-# Current output function
-MCM_output=MCM_output
 
 # The following variables are set for the current task being processed.
 
@@ -458,7 +462,7 @@ MCM_parameter ()
 		value="$(cat "$value")"
 		;;
 	esac
-	$MCM_output "export $var=$(MCM_quote "$value")"
+	MCM_output_body "export $var=$(MCM_quote "$value")"
 }
 
 MCM_add_module_definition ()
@@ -486,7 +490,7 @@ MCM_add_module_call ()
 	local module="$1"
 	local modulepath="$2"
 
-	$MCM_output "$(MCM_print_task_logic "$module")"
+	MCM_output_body "$(MCM_print_task_logic "$module")"
 }
 
 # The main function for this program.
@@ -545,7 +549,6 @@ MCM_main ()
 	fi
 
 	printf '%s\n' "$(MCM_print_header)"
-
 	# Embed the user script that calls task and other public functions.
 	if [ "$MCM_source" != '-' ]; then
 		test -f "$MCM_source" || MCM_fatal "File \"$MCM_source\" not found"
@@ -562,8 +565,8 @@ MCM_main ()
 	fi
 
 	printf '%s\n' "$MCM_tasks_definitions"
-	printf '%s\n' "$MCM_target_script"
-	printf '%s\n' "$(MCM_print_footer)"
+	printf '%s\n' "$MCM_target_script_body"
+	MCM_print_footer
 }
 
 ### Public functions ###
@@ -577,7 +580,7 @@ include () {
 
 raw ()
 {
-	MCM_target_script="${MCM_target_script}$(cat)${MCM_NL}"
+	MCM_target_script_body="${MCM_target_script_body}$(cat)${MCM_NL}"
 }
 
 # The most important public function that define new tasks to be added to the
@@ -605,8 +608,8 @@ task ()
 	MCM_add_module_definition "$module"
 	local name="$module"
 
-	$MCM_output ''
-	$MCM_output "# ---- $name"
+	MCM_output_body ''
+	MCM_output_body "# ---- $name"
 
 	# We make a shell-friendly list of required and optional parameters so
 	# we can detect user typos.
@@ -649,14 +652,12 @@ task ()
 	# Add code for removal of parameter files.
 	local p
 	for p in $parameters_passed; do
-		$MCM_output "unset $p"
+		MCM_output_body "unset $p"
 	done
-
-	MCM_output=MCM_output
 }
 
 name () {
-	$MCM_output "printf '%s ' $(MCM_quote "$1") "
+	MCM_output_body "printf '%s ' $(MCM_quote "$1") "
 	shift
 	"$@"
 }
@@ -665,20 +666,20 @@ notify () {
 	local notification="$1"
 	shift
 	"$@"
-	$MCM_output ": \${MCM_handler_$notification:=ok}"
-	$MCM_output "if [ \$MCM_state = 'nok' -o \$MCM_state = 'changed' ]; then"
-	$MCM_output " MCM_handler_$notification=\$MCM_state"
-	$MCM_output 'fi'
+	MCM_output_body ": \${MCM_handler_$notification:=ok}"
+	MCM_output_body "if [ \$MCM_state = 'nok' -o \$MCM_state = 'changed' ]; then"
+	MCM_output_body " MCM_handler_$notification=\$MCM_state"
+	MCM_output_body 'fi'
 }
 
 handler () {
 	local handler="$1"
 	shift
 	local v="\${MCM_handler_$handler-unset}"
-	$MCM_output "if [ $v = 'nok' -o $v = 'changed' ]; then"
-	$MCM_output "printf '(handler %s) ' '$handler'"
+	MCM_output_body "if [ $v = 'nok' -o $v = 'changed' ]; then"
+	MCM_output_body "printf '(handler %s) ' '$handler'"
 	"$@"
-	$MCM_output "fi"
+	MCM_output_body "fi"
 }
 
 MCM_main "$@"
