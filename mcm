@@ -548,7 +548,7 @@ MCM_main ()
 		MCM_usage
 	fi
 
-	printf '%s\n' "$(MCM_print_header)"
+	MCM_print_header
 	# Embed the user script that calls task and other public functions.
 	if [ "$MCM_source" != '-' ]; then
 		test -f "$MCM_source" || MCM_fatal "File \"$MCM_source\" not found"
